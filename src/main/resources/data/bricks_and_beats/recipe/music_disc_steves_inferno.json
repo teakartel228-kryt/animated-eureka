@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:note_block",
+    "minecraft:black_dye",
+    "minecraft:black_dye",
+    "minecraft:blaze_powder"
+  ],
+  "result": {
+    "id": "bricks_and_beats:music_disc_steves_inferno",
+    "count": 1
+  }
+}

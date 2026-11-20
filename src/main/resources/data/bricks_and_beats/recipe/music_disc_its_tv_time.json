@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:note_block",
+    "minecraft:black_dye",
+    "minecraft:black_dye",
+    "minecraft:gold_ingot"
+  ],
+  "result": {
+    "id": "bricks_and_beats:music_disc_its_tv_time",
+    "count": 1
+  }
+}

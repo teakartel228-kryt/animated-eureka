@@ -1,0 +1,10 @@
+{
+  "comparator_output": 10,
+  "description": {
+    "text": "BIG SHOT"
+  },
+  "length_in_seconds": 148,
+  "sound_event": {
+    "sound_id": "bricks_and_beats:music_disc.big_shot"
+  }
+}

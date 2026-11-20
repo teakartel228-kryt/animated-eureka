@@ -1,0 +1,10 @@
+{
+  "comparator_output": 10,
+  "description": {
+    "text": "IT'S TV TIME!"
+  },
+  "length_in_seconds": 215,
+  "sound_event": {
+    "sound_id": "bricks_and_beats:music_disc.its_tv_time"
+  }
+}

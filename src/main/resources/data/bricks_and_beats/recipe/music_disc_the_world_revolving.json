@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:note_block",
+    "minecraft:black_dye",
+    "minecraft:black_dye",
+    "minecraft:lapis_lazuli"
+  ],
+  "result": {
+    "id": "bricks_and_beats:music_disc_the_world_revolving",
+    "count": 1
+  }
+}

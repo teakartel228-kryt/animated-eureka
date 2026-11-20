@@ -1,0 +1,42 @@
+{
+  "music_disc.hammer_of_justice": {
+    "sounds": [
+      {
+        "name": "bricks_and_beats:records/hammer_of_justice",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.its_tv_time": {
+    "sounds": [
+      {
+        "name": "bricks_and_beats:records/its_tv_time",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.the_world_revolving": {
+    "sounds": [
+      {
+        "name": "bricks_and_beats:records/the_world_revolving",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.steves_inferno": {
+    "sounds": [
+      {
+        "name": "bricks_and_beats:records/steves_inferno",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.big_shot": {
+    "sounds": [
+      {
+        "name": "bricks_and_beats:records/big_shot",
+        "stream": true
+      }
+    ]
+  }
+}

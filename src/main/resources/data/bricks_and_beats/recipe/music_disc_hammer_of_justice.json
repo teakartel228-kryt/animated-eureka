@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:note_block",
+    "minecraft:black_dye",
+    "minecraft:black_dye",
+    "minecraft:iron_ingot"
+  ],
+  "result": {
+    "id": "bricks_and_beats:music_disc_hammer_of_justice",
+    "count": 1
+  }
+}
