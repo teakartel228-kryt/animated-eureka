@@ -237,7 +237,7 @@ public final class Hooks {
 		owner.hurtMarked = true;
 		sl.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY(0.5), target.getZ(), 20, 0.4, 0.4, 0.4, 0.3);
 		sl.playSound(null, owner.blockPosition(), SoundEvents.ANVIL_DESTROY, SoundSource.PLAYERS, 1.0F, 1.2F);
-		if (owner instanceof Player p) p.displayClientMessage(Component.translatable("message.bricks_and_beats.emergency"), true);
+		if (owner instanceof ServerPlayer p) p.sendSystemMessage(Component.translatable("message.bricks_and_beats.emergency"), true);
 		release(ps);
 	}
 
