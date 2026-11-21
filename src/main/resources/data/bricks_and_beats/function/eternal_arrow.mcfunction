@@ -1,1 +1,1 @@
-data merge entity @s {NoGravity:1b}
+tag @s add ba_eternal

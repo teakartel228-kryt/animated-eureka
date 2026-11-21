@@ -20,6 +20,9 @@
   "slots": [
     "mainhand"
   ],
+  "exclusive_set": [
+    "bricks_and_beats:amethyst_spray"
+  ],
   "effects": {
     "minecraft:projectile_spawned": [
       {

@@ -17,6 +17,10 @@ public final class ModEntities {
 			EntityType.Builder.<BrickShard>of(BrickShard::new, MobCategory.MISC)
 					.sized(0.2F, 0.2F).clientTrackingRange(4).updateInterval(5));
 
+	public static final EntityType<AmethystPellet> AMETHYST_PELLET = register("amethyst_pellet",
+			EntityType.Builder.<AmethystPellet>of(AmethystPellet::new, MobCategory.MISC)
+					.sized(0.2F, 0.2F).clientTrackingRange(4).updateInterval(2));
+
 	private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
 		ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, BricksAndBeats.id(name));
 		return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, builder.build(key));

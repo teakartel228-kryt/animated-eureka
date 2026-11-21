@@ -23,6 +23,10 @@ public class BricksAndBeats implements ModInitializer {
 		ModItems.init();
 		ModEntities.init();
 		FurnaceDynamite.init();
+		ModEffects.init();
+		ArrowEnchants.init();
+		MobVariants.init();
+		ModTab.init();
 
 		// Right click with a brick / nether brick -> throw it.
 		UseItemCallback.EVENT.register((player, level, hand) -> {

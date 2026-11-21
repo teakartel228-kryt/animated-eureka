@@ -9,5 +9,6 @@ public class BricksAndBeatsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		EntityRenderers.register(ModEntities.THROWN_BRICK, ThrownItemRenderer::new);
 		EntityRenderers.register(ModEntities.BRICK_SHARD, ThrownItemRenderer::new);
+		EntityRenderers.register(ModEntities.AMETHYST_PELLET, ThrownItemRenderer::new);
 	}
 }

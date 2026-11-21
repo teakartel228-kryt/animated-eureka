@@ -1,6 +1,13 @@
 {
   "replace": false,
   "values": [
-    "bricks_and_beats:eternal_arrow"
+    "bricks_and_beats:eternal_arrow",
+    "bricks_and_beats:ink_shot",
+    "bricks_and_beats:music_weapon",
+    "bricks_and_beats:chaos_strike",
+    "bricks_and_beats:far_chaos",
+    "bricks_and_beats:shield_breaker",
+    "bricks_and_beats:amethyst_spray",
+    "bricks_and_beats:ultra_power"
   ]
 }
