@@ -1,0 +1,146 @@
+{
+  "textures": {
+    "t": "bricks_and_beats:item/thrown_nether_brick",
+    "particle": "bricks_and_beats:item/thrown_nether_brick"
+  },
+  "elements": [
+    {
+      "name": "brick",
+      "from": [
+        3,
+        6.5,
+        5.5
+      ],
+      "to": [
+        13,
+        9.5,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#t"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#t"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            8,
+            6
+          ],
+          "texture": "#t"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            8,
+            6
+          ],
+          "texture": "#t"
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            16,
+            16
+          ],
+          "texture": "#t"
+        },
+        "down": {
+          "uv": [
+            0,
+            6,
+            16,
+            16
+          ],
+          "texture": "#t"
+        }
+      }
+    },
+    {
+      "name": "chip",
+      "from": [
+        4,
+        9.5,
+        6.2
+      ],
+      "to": [
+        6,
+        10.1,
+        8.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2,
+            2,
+            6,
+            6
+          ],
+          "texture": "#t"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            6,
+            6
+          ],
+          "texture": "#t"
+        },
+        "east": {
+          "uv": [
+            2,
+            2,
+            6,
+            6
+          ],
+          "texture": "#t"
+        },
+        "west": {
+          "uv": [
+            2,
+            2,
+            6,
+            6
+          ],
+          "texture": "#t"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            6,
+            6
+          ],
+          "texture": "#t"
+        },
+        "down": {
+          "uv": [
+            2,
+            2,
+            6,
+            6
+          ],
+          "texture": "#t"
+        }
+      }
+    }
+  ]
+}
