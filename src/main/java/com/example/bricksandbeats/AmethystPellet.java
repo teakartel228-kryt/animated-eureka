@@ -21,8 +21,11 @@ import net.minecraft.world.phys.Vec3;
 
 /** Pellet of the "Amethyst Spray" shotgun: short range, damages and knocks back along its flight direction. */
 public class AmethystPellet extends ThrowableItemProjectile {
-	public static final float DAMAGE = 3.0F;
+	public static final float DAMAGE = 4.0F;
 	private static final int MAX_FLIGHT_TICKS = 12; // a bit shorter than a normal arrow
+
+	/** Weapon that fired the pellet (so Ink Shot / Far Chaos / Musical Weapon work on pellets too). */
+	private ItemStack weapon = ItemStack.EMPTY;
 
 	public AmethystPellet(EntityType<? extends ThrowableItemProjectile> type, Level level) {
 		super(type, level);
@@ -36,12 +39,17 @@ public class AmethystPellet extends ThrowableItemProjectile {
 
 	/** Fires a cone of pellets. */
 	public static void spray(ServerLevel level, LivingEntity owner, Vec3 pos, Vec3 dir, int count, double spread, double speed) {
+		spray(level, owner, pos, dir, count, spread, speed, ItemStack.EMPTY);
+	}
+
+	public static void spray(ServerLevel level, LivingEntity owner, Vec3 pos, Vec3 dir, int count, double spread, double speed, ItemStack weapon) {
 		RandomSource r = level.getRandom();
 		for (int i = 0; i < count; i++) {
 			Vec3 d = dir.normalize().add(r.nextGaussian() * spread, r.nextGaussian() * spread, r.nextGaussian() * spread)
 					.normalize().scale(speed);
 			AmethystPellet p = new AmethystPellet(level, pos.x, pos.y, pos.z, new ItemStack(Items.AMETHYST_SHARD));
 			p.setOwner(owner);
+			p.weapon = weapon == null ? ItemStack.EMPTY : weapon.copy();
 			p.setDeltaMovement(d);
 			level.addFreshEntity(p);
 		}
@@ -67,7 +75,13 @@ public class AmethystPellet extends ThrowableItemProjectile {
 		super.onHitEntity(hit);
 		if (level() instanceof ServerLevel serverLevel) {
 			Entity target = hit.getEntity();
-			target.hurtServer(serverLevel, damageSources().thrown(this, getOwner()), DAMAGE);
+			// Every pellet must hurt: drop the invulnerability frames left by the previous pellet of the same shot.
+			if (target instanceof LivingEntity living) living.invulnerableTime = 0;
+			boolean hurt = target.hurtServer(serverLevel, damageSources().thrown(this, getOwner()), DAMAGE);
+			if (hurt && target instanceof LivingEntity living) {
+				ArrowEnchants.pelletHit(serverLevel, living, getOwner(), weapon);
+				living.invulnerableTime = 0;
+			}
 			// Knockback follows the flight direction, including its vertical part (shoot up = launch up, down = slam down).
 			Vec3 push = getDeltaMovement().normalize().scale(0.55);
 			target.push(push.x, push.y + 0.05, push.z);

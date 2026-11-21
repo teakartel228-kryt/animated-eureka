@@ -12,6 +12,17 @@ public final class ModItems {
 	public static final Item BRICK_SHARD = register("brick_shard", new Item.Properties());
 	public static final Item NETHER_BRICK_SHARD = register("nether_brick_shard", new Item.Properties());
 
+	public static final Item NECROMANCER_STAFF = register("necromancer_staff", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
+
+	public static final Item[] STAVES = {
+			register("wooden_staff", new Item.Properties().stacksTo(1)),
+			register("stone_staff", new Item.Properties().stacksTo(1)),
+			register("iron_staff", new Item.Properties().stacksTo(1)),
+			register("golden_staff", new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)),
+			register("diamond_staff", new Item.Properties().stacksTo(1).rarity(Rarity.RARE)),
+			register("netherite_staff", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)),
+	};
+
 	/** Flying claw of the hook (renders the claw model; not obtainable, not in the creative tab). */
 	public static final Item HOOK_HEAD = register("hook_head", new Item.Properties());
 

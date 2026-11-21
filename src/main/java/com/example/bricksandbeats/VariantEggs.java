@@ -21,6 +21,14 @@ public final class VariantEggs {
 			{"bard", "skeleton", "ba_mob_bard"},
 			{"amethyst_shooter", "skeleton", "ba_mob_amethyst"},
 			{"ink_skeleton", "skeleton", "ba_mob_ink"},
+			{"necromancer", "zombie", "ba_mob_necro"},
+			{"breaker", "zombie", "ba_mob_breaker"},
+			{"miner", "zombie", "ba_mob_miner"},
+			{"ram", "zombie", "ba_mob_ram"},
+			{"digger", "zombie", "ba_mob_digger"},
+			{"bulwark", "zombie", "ba_mob_bulwark"},
+			{"frost_skeleton", "skeleton", "ba_mob_frost"},
+			{"fire_skeleton", "skeleton", "ba_mob_fire"},
 	};
 
 	public static List<ItemStack> stacks() {

@@ -36,6 +36,10 @@ public final class ArrowEnchants {
 	private static final Set<AbstractArrow> ARROWS = Collections.newSetFromMap(new IdentityHashMap<>());
 	/** Eternal arrows -> launch speed. */
 	private static final Map<AbstractArrow, Double> ETERNAL = new IdentityHashMap<>();
+	private static final Set<AbstractArrow> DISCARD = Collections.newSetFromMap(new IdentityHashMap<>());
+	private static final Map<AbstractArrow, Integer> ULTRA_BREAKS = new IdentityHashMap<>();
+	private static final int ULTRA_MAX_BREAKS = 12;
+	private static final float ULTRA_MAX_HARDNESS = 3.0F; // stone 1.5, wood 2, ores 3 ... obsidian stays
 	private static boolean busy; // recursion guard for damage we deal ourselves
 
 	public static boolean has(ItemStack stack, String name) {
@@ -48,15 +52,25 @@ public final class ArrowEnchants {
 
 	public static void init() {
 		ServerEntityEvents.ENTITY_LOAD.register((e, level) -> {
-			if (e instanceof AbstractArrow a) ARROWS.add(a);
+			if (e instanceof AbstractArrow a) {
+				ARROWS.add(a);
+				onArrowLoad(level, a);
+			}
 		});
 		ServerEntityEvents.ENTITY_UNLOAD.register((e, level) -> {
 			if (e instanceof AbstractArrow a) {
 				ARROWS.remove(a);
 				ETERNAL.remove(a);
+				ULTRA_BREAKS.remove(a);
 			}
 		});
-		ServerTickEvents.END_SERVER_TICK.register(server -> tickArrows());
+		// Ultra Power has to clear blocks BEFORE the arrow moves (after the move it is already stuck in the wall).
+		ServerTickEvents.START_SERVER_TICK.register(server -> tickUltra());
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			for (AbstractArrow a : new ArrayList<>(DISCARD)) a.discard();
+			DISCARD.clear();
+			tickArrows();
+		});
 		ServerLivingEntityEvents.AFTER_DAMAGE.register(ArrowEnchants::onDamage);
 	}
 
@@ -69,6 +83,7 @@ public final class ArrowEnchants {
 				ETERNAL.remove(a);
 				continue;
 			}
+			if (DISCARD.contains(a)) continue;
 			boolean amethyst = TagUtil.has(a, "ba_amethyst");
 			boolean ultra = TagUtil.has(a, "ba_ultra");
 			boolean eternal = TagUtil.has(a, "ba_eternal");
@@ -85,8 +100,6 @@ public final class ArrowEnchants {
 
 			if (amethyst) {
 				amethyst(level, a);
-			} else if (ultra) {
-				ultra(level, a);
 			}
 			if (eternal) {
 				eternal(a);
@@ -98,28 +111,62 @@ public final class ArrowEnchants {
 	private static void amethyst(ServerLevel level, AbstractArrow a) {
 		Vec3 v = a.getDeltaMovement();
 		if (v.lengthSqr() > 1.0E-4 && a.getOwner() instanceof LivingEntity owner) {
-			AmethystPellet.spray(level, owner, a.position(), v, 8, 0.09, 1.9);
+			AmethystPellet.spray(level, owner, a.position(), v, 8, 0.09, 1.9, a.getWeaponItem());
 		}
 		ETERNAL.remove(a);
 		a.discard();
 	}
 
-	/** Ultra Power: pierces mobs and smashes weak blocks (targets, glass, leaves...). */
-	private static void ultra(ServerLevel level, AbstractArrow a) {
-		// Piercing (6 mobs) comes from the minecraft:projectile_piercing effect in enchantment/ultra_power.json.
+	/** Amethyst Spray: the pellets fly the very moment the arrow is created (no 1-tick delay, the arrow never flies). */
+	private static void onArrowLoad(ServerLevel level, AbstractArrow a) {
+		ItemStack weapon = a.getWeaponItem();
+		if (weapon == null || weapon.isEmpty() || !has(weapon, "amethyst_spray")) return;
+		if (TagUtil.has(a, "ba_sprayed")) return;
 		Vec3 v = a.getDeltaMovement();
-		if (v.lengthSqr() < 0.04) return; // stuck in a block
-		for (double f : new double[]{0.0, 0.5, 1.0, 1.5}) {
-			BlockPos pos = BlockPos.containing(a.position().add(v.scale(f)));
+		if (v.lengthSqr() < 0.25) return; // not a fresh shot
+		if (!(a.getOwner() instanceof LivingEntity)) return;
+		LivingEntity owner = (LivingEntity) a.getOwner();
+		a.addTag("ba_sprayed");
+		if (owner instanceof Player p) p.getCooldowns().addCooldown(weapon, 80);
+		AmethystPellet.spray(level, owner, a.position(), v, 8, 0.09, 1.9, weapon);
+		a.setDeltaMovement(Vec3.ZERO);
+		a.setInvisible(true);
+		a.noPhysics = true;
+		DISCARD.add(a);
+	}
+
+	private static void tickUltra() {
+		for (AbstractArrow a : new ArrayList<>(ARROWS)) {
+			if (a.isRemoved() || !(a.level() instanceof ServerLevel level)) continue;
+			if (!TagUtil.has(a, "ba_ultra")) continue;
+			smash(level, a);
+		}
+	}
+
+	/** Ultra Power: looks ahead along the flight path and smashes every block it can (hardness <= 3), up to 12 blocks per arrow. */
+	private static void smash(ServerLevel level, AbstractArrow a) {
+		Vec3 v = a.getDeltaMovement();
+		double len = v.length();
+		if (len < 0.5) return; // stuck in a block / spent
+		int used = ULTRA_BREAKS.getOrDefault(a, 0);
+		if (used >= ULTRA_MAX_BREAKS) return;
+		int steps = (int) Math.ceil(len / 0.5);
+		BlockPos last = null;
+		for (int i = 0; i <= steps && used < ULTRA_MAX_BREAKS; i++) {
+			BlockPos pos = BlockPos.containing(a.position().add(v.scale((double) i / steps)));
+			if (pos.equals(last)) continue;
+			last = pos;
 			BlockState state = level.getBlockState(pos);
 			if (state.isAir() || !state.getFluidState().isEmpty()) continue;
 			float hardness = state.getDestroySpeed(level, pos);
-			if (state.is(Blocks.TARGET) || (hardness >= 0.0F && hardness <= 0.4F)) {
-				level.destroyBlock(pos, true, a);
-				v = v.scale(0.9);
-				a.setDeltaMovement(v);
-			}
+			if (hardness < 0.0F || hardness > ULTRA_MAX_HARDNESS) continue;
+			level.destroyBlock(pos, true, a);
+			used++;
+			v = v.scale(0.93);
 		}
+		ULTRA_BREAKS.put(a, used);
+		a.setDeltaMovement(v);
+		a.hurtMarked = true;
 	}
 
 	/**
@@ -150,6 +197,17 @@ public final class ArrowEnchants {
 		ItemStack weapon = source.getWeaponItem();
 		if (weapon == null || weapon.isEmpty()) return;
 		LivingEntity attacker = source.getEntity() instanceof LivingEntity l ? l : null;
+		applyHit(level, target, attacker, weapon, blocked);
+	}
+
+	/** Called by amethyst pellets so the weapon's hit enchantments (ink, chaos, music...) apply to them too. */
+	public static void pelletHit(ServerLevel level, LivingEntity target, net.minecraft.world.entity.Entity owner, ItemStack weapon) {
+		if (weapon == null || weapon.isEmpty()) return;
+		applyHit(level, target, owner instanceof LivingEntity l ? l : null, weapon, false);
+	}
+
+	private static void applyHit(ServerLevel level, LivingEntity target, LivingEntity attacker, ItemStack weapon, boolean blocked) {
+		if (busy) return;
 		busy = true;
 		try {
 			// Shield Breaker (15%): disables the shield.

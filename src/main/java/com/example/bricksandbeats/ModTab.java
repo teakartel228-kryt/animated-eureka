@@ -55,6 +55,8 @@ public final class ModTab {
 					out.accept(ModItems.DISC_STEVES_INFERNO);
 					out.accept(ModItems.DISC_BIG_SHOT);
 					out.accept(Items.TNT);
+					out.accept(ModItems.NECROMANCER_STAFF);
+					for (Item st : ModItems.STAVES) out.accept(st);
 					for (ItemStack egg : VariantEggs.stacks()) out.accept(egg);
 					for (Item h : HookRegistry.HOOKS) out.accept(h);
 					List<Holder<Potion>> potions = List.of(ModEffects.RHYTHM_POTION, ModEffects.BRICK_SKIN_POTION,

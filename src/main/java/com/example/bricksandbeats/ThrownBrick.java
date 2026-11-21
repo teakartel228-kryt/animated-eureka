@@ -1,5 +1,6 @@
 package com.example.bricksandbeats;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -30,7 +31,14 @@ public class ThrownBrick extends ThrowableItemProjectile {
 	}
 
 	public ThrownBrick(Level level, LivingEntity owner, ItemStack stack) {
-		super(ModEntities.THROWN_BRICK, owner, level, stack);
+		super(ModEntities.THROWN_BRICK, owner, level, withModel(stack));
+	}
+
+	/** Gives the flying brick its own 3D model (assets/items/thrown_brick.json, thrown_nether_brick.json). */
+	private static ItemStack withModel(ItemStack stack) {
+		ItemStack copy = stack.copyWithCount(1);
+		copy.set(DataComponents.ITEM_MODEL, BricksAndBeats.id(copy.is(Items.NETHER_BRICK) ? "thrown_nether_brick" : "thrown_brick"));
+		return copy;
 	}
 
 	@Override

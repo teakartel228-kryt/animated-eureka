@@ -34,6 +34,21 @@ public class BricksAndBeats implements ModInitializer {
 
 		UseItemCallback.EVENT.register(Hooks::use);
 
+		UseItemCallback.EVENT.register((player, level, hand) -> Staffs.use(player, level, player.getItemInHand(hand)));
+
+		// Necromancer staff: summons 3 friendly zombies from the ground in a triangle, 40 s cooldown.
+		UseItemCallback.EVENT.register((player, level, hand) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (!stack.is(ModItems.NECROMANCER_STAFF)) return InteractionResult.PASS;
+			if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
+			if (level instanceof ServerLevel serverLevel) {
+				var look = player.getLookAngle();
+				MobVariants.summonTriangle(serverLevel, player.position(), look.x, look.z, true);
+			}
+			player.getCooldowns().addCooldown(stack, 800);
+			return InteractionResult.SUCCESS;
+		});
+
 		// Right click with a brick / nether brick -> throw it.
 		UseItemCallback.EVENT.register((player, level, hand) -> {
 			ItemStack stack = player.getItemInHand(hand);
