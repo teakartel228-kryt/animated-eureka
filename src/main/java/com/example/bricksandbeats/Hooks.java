@@ -135,12 +135,46 @@ public final class Hooks {
 		return hp >= 200 ? 6 : hp > 40 ? 5 : 0;
 	}
 
-	static void chain(ServerLevel sl, Vec3 from, Vec3 to) {
+	/** Where the chain leaves the gun (right hip, a little in front of the owner). */
+	static Vec3 handPos(LivingEntity o) {
+		Vec3 look = o.getLookAngle();
+		Vec3 flat = new Vec3(look.x, 0, look.z);
+		Vec3 fwd = flat.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : flat.normalize();
+		Vec3 right = new Vec3(-fwd.z, 0, fwd.x);
+		return o.getEyePosition().add(0, -0.45, 0).add(fwd.scale(0.55)).add(right.scale(-0.25));
+	}
+
+	/** Real 3D claw + interlocking chain links drawn with display entities (model per hook level). */
+	static void visuals(ServerLevel sl, HookEntity hook, LivingEntity owner) {
+		Vec3 from = handPos(owner);
+		Vec3 to = hook.position();
 		Vec3 d = to.subtract(from);
-		int n = (int) Math.min(16, d.length() / 2);
-		for (int i = 1; i <= n; i++) {
-			Vec3 p = from.add(d.scale(i / (double) (n + 1)));
-			sl.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.x, p.y, p.z, 1, 0, 0, 0, 0);
+		double len = d.length();
+		int lvl = Math.max(0, Math.min(5, hook.lvl));
+		Vec3 aim = hook.state == HookEntity.State.FLYING && hook.getDeltaMovement().lengthSqr() > 1.0E-4 ? hook.getDeltaMovement() : d;
+		float hy = Fx.yawOf(aim), hp = Fx.pitchOf(aim);
+		if (hook.fxHead == null || hook.fxHead.isRemoved()) {
+			hook.fxHead = Fx.item(sl, "hook_head_" + lvl, to, hy, hp);
+			Fx.follow(hook, hook.fxHead);
+		} else {
+			Fx.move(sl, hook.fxHead, to, hy, hp);
+		}
+		int n = len < 0.6 ? 0 : (int) Math.min(40, Math.ceil(len));
+		float cy = Fx.yawOf(d), cp = Fx.pitchOf(d);
+		while (hook.fxChain.size() < n) {
+			Entity seg = Fx.item(sl, "chain_" + lvl, from, cy, cp);
+			Fx.follow(hook, seg);
+			hook.fxChain.add(seg);
+		}
+		for (int i = 0; i < hook.fxChain.size(); i++) {
+			Entity seg = hook.fxChain.get(i);
+			if (seg == null) continue;
+			if (i >= n) { // chain got shorter: hide the extra links inside the hand
+				Fx.move(sl, seg, from, cy, cp);
+				continue;
+			}
+			Vec3 p = from.add(d.scale((i + 0.5) / n));
+			Fx.move(sl, seg, p, cy, cp);
 		}
 	}
 
@@ -165,26 +199,45 @@ public final class Hooks {
 		int lvl = levelOf(stack);
 		if (lvl < 0) return InteractionResult.PASS;
 		if (!(level instanceof ServerLevel sl)) return InteractionResult.SUCCESS;
+		fire(sl, p, stack, p.getLookAngle(), true);
+		return InteractionResult.SUCCESS;
+	}
 
-		PS ps = STATE.computeIfAbsent(p.getUUID(), k -> new PS());
+	/** Fires (or, with all hooks out, releases) the hook of {@code owner}. Used by players and by hook-wielding mobs. */
+	static boolean fire(ServerLevel sl, LivingEntity owner, ItemStack stack, Vec3 dir, boolean releaseWhenFull) {
+		int lvl = levelOf(stack);
+		if (lvl < 0) return false;
+		PS ps = STATE.computeIfAbsent(owner.getUUID(), k -> new PS());
 		ps.hooks.removeIf(HookEntity::isRemoved);
 		int max = (lvl >= 4 ? 2 : 1) + (ench(stack, Enchantments.MULTISHOT) > 0 ? 1 : 0);
 		long now = sl.getGameTime();
-		if (now - ps.lastFire < 4) return InteractionResult.SUCCESS;
+		if (now - ps.lastFire < 4) return false;
 		if (ps.hooks.size() >= max) { // using again with all hooks out = release
-			release(ps);
-			return InteractionResult.SUCCESS;
+			if (releaseWhenFull) release(ps);
+			return false;
 		}
 		ps.lastFire = now;
-		HookEntity h = new HookEntity(sl, p, new ItemStack(ModItems.HOOK_HEAD));
+		HookEntity h = new HookEntity(sl, owner, new ItemStack(ModItems.HOOK_HEAD));
 		h.lvl = lvl;
 		h.power = ench(stack, Enchantments.POWER);
 		h.range = lvl >= 4 ? 32 : 20;
-		h.setDeltaMovement(p.getLookAngle().scale(2.5));
+		h.setDeltaMovement(dir.normalize().scale(2.5));
 		sl.addFreshEntity(h);
 		ps.hooks.add(h);
-		sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0F, 1.6F);
-		return InteractionResult.SUCCESS;
+		sl.playSound(null, owner.getX(), owner.getY(), owner.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0F, 1.6F);
+		return true;
+	}
+
+	/** Mobs holding a hook: shoot it at their target (called from MobAbilities). */
+	static void mobFire(ServerLevel sl, net.minecraft.world.entity.Mob mob, LivingEntity target) {
+		ItemStack held = heldHook(mob);
+		if (held.isEmpty()) return;
+		PS ps = STATE.computeIfAbsent(mob.getUUID(), k -> new PS());
+		ps.hooks.removeIf(HookEntity::isRemoved);
+		long now = sl.getGameTime();
+		if (!ps.hooks.isEmpty() || now < ps.disabledUntil || now - ps.lastFire < 70) return;
+		Vec3 d = target.position().add(0, target.getBbHeight() * 0.5, 0).subtract(mob.getEyePosition());
+		if (fire(sl, mob, held, d, false)) mob.swing(InteractionHand.MAIN_HAND);
 	}
 
 	// ------------------------------------------------------------ hits
@@ -193,6 +246,10 @@ public final class Hooks {
 		if (!(hook.getOwner() instanceof LivingEntity owner)) { hook.discard(); return; }
 		PS ps = STATE.computeIfAbsent(owner.getUUID(), k -> new PS());
 		long now = sl.getGameTime();
+		if (owner instanceof net.minecraft.world.entity.Mob m && m.getTarget() != target) { // mobs only hook their own target
+			hook.discard();
+			return;
+		}
 
 		if (target instanceof LivingEntity) {
 			target.hurtServer(sl, sl.damageSources().thrown(hook, owner), 2.0F);
@@ -243,6 +300,10 @@ public final class Hooks {
 
 	static void hitBlock(ServerLevel sl, HookEntity hook, BlockHitResult hit) {
 		if (!(hook.getOwner() instanceof LivingEntity owner)) { hook.discard(); return; }
+		if (!(owner instanceof Player)) { // mobs never grapple blocks
+			hook.discard();
+			return;
+		}
 		PS ps = STATE.computeIfAbsent(owner.getUUID(), k -> new PS());
 		BlockPos pos = hit.getBlockPos();
 		BlockState st = sl.getBlockState(pos);
@@ -328,6 +389,14 @@ public final class Hooks {
 	// ------------------------------------------------------------ per tick
 
 	private static void tick(MinecraftServer server) {
+		Fx.tick();
+		if (server.getTickCount() % 200 == 0) { // forget idle owners (mobs that died, players that left)
+			long now = server.overworld().getGameTime();
+			STATE.entrySet().removeIf(en -> {
+				en.getValue().hooks.removeIf(HookEntity::isRemoved);
+				return en.getValue().hooks.isEmpty() && now > en.getValue().disabledUntil && now - en.getValue().lastFire > 400;
+			});
+		}
 		for (Iterator<Temp> it = TEMP.iterator(); it.hasNext(); ) {
 			Temp t = it.next();
 			if (t.level().getGameTime() >= t.expire()) {

@@ -46,8 +46,8 @@ import java.util.Set;
 public final class MobVariants {
 	private static final String NECRO = "ba_mob_necro";
 	private static final String[] ZOMBIE = {"ba_mob_brick", "ba_mob_dynamite", "ba_mob_breaker", "ba_mob_miner",
-			"ba_mob_ram", "ba_mob_digger", "ba_mob_bulwark"};
-	private static final String[] SKELETON = {"ba_mob_bard", "ba_mob_amethyst", "ba_mob_ink", "ba_mob_frost", "ba_mob_fire"};
+			"ba_mob_ram", "ba_mob_digger", "ba_mob_bulwark", "ba_mob_hookz"};
+	private static final String[] SKELETON = {"ba_mob_bard", "ba_mob_amethyst", "ba_mob_ink", "ba_mob_frost", "ba_mob_fire", "ba_mob_hooks"};
 
 	private static final Map<Mob, String> VARIANT = new IdentityHashMap<>();
 	private static final Map<Mob, Integer> FUSES = new IdentityHashMap<>();
@@ -114,6 +114,12 @@ public final class MobVariants {
 		// Staff-summoned zombies never hurt players.
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) ->
 				!(entity instanceof Player && source.getEntity() instanceof Mob m && MINIONS.contains(m)));
+	}
+
+	/** True for the zombies that already have their own block-breaking logic (breaker / miner / ram / digger). */
+	public static boolean isBlockBreaker(Mob m) {
+		String v = VARIANT.get(m);
+		return v != null && (v.equals("ba_mob_breaker") || v.equals("ba_mob_miner") || v.equals("ba_mob_ram") || v.equals("ba_mob_digger"));
 	}
 
 	public static boolean isMinion(net.minecraft.world.entity.Entity e) {

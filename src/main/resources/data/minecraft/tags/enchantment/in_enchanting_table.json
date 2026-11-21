@@ -11,6 +11,9 @@
     "bricks_and_beats:ultra_power",
     "bricks_and_beats:hook_hands",
     "bricks_and_beats:redstone_hook",
-    "bricks_and_beats:defensive_mechanism"
+    "bricks_and_beats:defensive_mechanism",
+    "bricks_and_beats:piston_power",
+    "bricks_and_beats:sticky_piston",
+    "bricks_and_beats:piston_recoil"
   ]
 }

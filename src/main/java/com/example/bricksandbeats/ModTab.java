@@ -59,6 +59,7 @@ public final class ModTab {
 					for (Item st : ModItems.STAVES) out.accept(st);
 					for (ItemStack egg : VariantEggs.stacks()) out.accept(egg);
 					for (Item h : HookRegistry.HOOKS) out.accept(h);
+					out.accept(ModItems.HAND_PISTON);
 					List<Holder<Potion>> potions = List.of(ModEffects.RHYTHM_POTION, ModEffects.BRICK_SKIN_POTION,
 							ModEffects.FRAGILITY_POTION, ModEffects.CHAOS_POTION);
 					for (Holder<Potion> potion : potions) {

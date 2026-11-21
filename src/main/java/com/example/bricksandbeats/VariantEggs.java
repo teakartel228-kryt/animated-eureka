@@ -29,6 +29,11 @@ public final class VariantEggs {
 			{"bulwark", "zombie", "ba_mob_bulwark"},
 			{"frost_skeleton", "skeleton", "ba_mob_frost"},
 			{"fire_skeleton", "skeleton", "ba_mob_fire"},
+			{"hooker_zombie", "zombie", "ba_mob_hookz"},
+			{"hooker_skeleton", "skeleton", "ba_mob_hooks"},
+			// plain mobs: ba_rolled is set, so they never roll a variant
+			{"plain_zombie", "zombie", "ba_plain"},
+			{"plain_skeleton", "skeleton", "ba_plain"},
 	};
 
 	public static List<ItemStack> stacks() {

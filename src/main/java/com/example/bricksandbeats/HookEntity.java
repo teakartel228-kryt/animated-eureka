@@ -23,6 +23,8 @@ public class HookEntity extends ThrowableItemProjectile {
 	public double range = 20;
 	public Vec3 anchor;  // GRAPPLE point
 	public Entity pulled; // PULL target
+	public Entity fxHead;                                  // 3D claw (display entity)
+	public final java.util.List<Entity> fxChain = new java.util.ArrayList<>(); // chain links (display entities)
 	private Vec3 origin;
 	private int age;
 
@@ -58,7 +60,7 @@ public class HookEntity extends ThrowableItemProjectile {
 		}
 		age++;
 		if (origin == null) origin = position();
-		if (age % 2 == 0) Hooks.chain(sl, owner.getEyePosition().add(0, -0.4, 0), position());
+		Hooks.visuals(sl, this, owner);
 
 		switch (state) {
 			case FLYING -> {

@@ -23,6 +23,8 @@ public final class ModItems {
 			register("netherite_staff", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)),
 	};
 
+	public static final Item HAND_PISTON = register("hand_piston", new Item.Properties().stacksTo(1).enchantable(15).rarity(Rarity.UNCOMMON), true);
+
 	/** Flying claw of the hook (renders the claw model; not obtainable, not in the creative tab). */
 	public static final Item HOOK_HEAD = register("hook_head", new Item.Properties());
 
@@ -39,8 +41,13 @@ public final class ModItems {
 	}
 
 	private static Item register(String name, Item.Properties properties) {
+		return register(name, properties, false);
+	}
+
+	private static Item register(String name, Item.Properties properties, boolean piston) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, BricksAndBeats.id(name));
-		return Registry.register(BuiltInRegistries.ITEM, key, new Item(properties.setId(key)));
+		Item.Properties p = properties.setId(key);
+		return Registry.register(BuiltInRegistries.ITEM, key, piston ? new HandPiston.PistonItem(p) : new Item(p));
 	}
 
 	public static void init() {

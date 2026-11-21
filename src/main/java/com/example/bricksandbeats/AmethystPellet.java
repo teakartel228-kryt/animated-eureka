@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -55,6 +56,23 @@ public class AmethystPellet extends ThrowableItemProjectile {
 		}
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2.0F, 0.6F);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.DECORATED_POT_SHATTER, SoundSource.PLAYERS, 1.0F, 1.6F);
+		// Shotgun kick: only for a player firing the enchanted crossbow (mobs have no weapon stack).
+		if (owner instanceof Player player && weapon != null && !weapon.isEmpty()) recoil(player, dir);
+	}
+
+	/** Throws the shooter opposite to the aim. Shooting down launches you up (rocket-jump), shooting forward pushes you back. Sneak = no recoil. */
+	private static void recoil(Player p, Vec3 dir) {
+		if (p.isShiftKeyDown() || dir.lengthSqr() < 1.0E-6) return;
+		Vec3 d = dir.normalize();
+		final double power = 1.0;
+		Vec3 v = p.getDeltaMovement();
+		// A downward shot gets a stronger vertical kick so the boost is really noticeable.
+		double vert = d.y < 0 ? 1.35 : 1.0;
+		// Small hop when firing level, otherwise ground friction eats the horizontal push.
+		double hop = (p.onGround() && d.y > -0.5) ? 0.2 : 0.0;
+		p.setDeltaMovement(v.x - d.x * power, v.y - d.y * power * vert + hop, v.z - d.z * power);
+		p.hurtMarked = true;
+		p.resetFallDistance();
 	}
 
 	@Override

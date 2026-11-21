@@ -30,6 +30,9 @@ public class BricksAndBeats implements ModInitializer {
 		ArrowEnchants.init();
 		MobVariants.init();
 		HookRegistry.init();
+		Fx.init();
+		HandPiston.init();
+		MobAbilities.init();
 		ModTab.init();
 
 		UseItemCallback.EVENT.register(Hooks::use);

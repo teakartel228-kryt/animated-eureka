@@ -46,6 +46,27 @@ public class ThrownBrick extends ThrowableItemProjectile {
 		return Items.BRICK;
 	}
 
+	private Entity fx;
+	private float roll;
+
+	/** The vanilla renderer always faces the camera, so the stack renders nothing and a spinning 3D brick (item_display) is drawn instead. */
+	@Override
+	public void tick() {
+		super.tick();
+		if (isRemoved() || !(level() instanceof ServerLevel sl)) return;
+		Vec3 v = getDeltaMovement();
+		Vec3 dir = v.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : v;
+		float yaw = Fx.yawOf(dir);
+		if (fx == null || fx.isRemoved()) {
+			fx = Fx.item(sl, isNether() ? "nether_brick_fx" : "brick_fx", position(), yaw, 0.0F);
+			Fx.follow(this, fx);
+		} else {
+			Fx.move(sl, fx, position().add(0, 0.1, 0), yaw, 0.0F);
+			roll = (roll + 100.0F) % 360.0F;
+			Fx.rollX(sl, fx, roll > 180.0F ? roll - 360.0F : roll);
+		}
+	}
+
 	private boolean isNether() {
 		return getItem().is(Items.NETHER_BRICK);
 	}
