@@ -1,0 +1,6 @@
+{
+  "parent": "bricks_and_beats:item/hook_gun",
+  "textures": {
+    "t": "bricks_and_beats:item/hook_gun_3"
+  }
+}
