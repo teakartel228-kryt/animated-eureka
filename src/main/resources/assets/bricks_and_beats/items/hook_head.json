@@ -1,6 +1,5 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "bricks_and_beats:item/hook_head"
+    "type": "minecraft:empty"
   }
 }
