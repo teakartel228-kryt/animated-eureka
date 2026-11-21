@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "bricks_and_beats:item/variant_spawn_egg",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 2825021
+      },
+      {
+        "type": "minecraft:constant",
+        "value": 8191130
+      }
+    ]
+  }
+}

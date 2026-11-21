@@ -1,0 +1,119 @@
+{
+  "textures": {
+    "t": "bricks_and_beats:item/thrown_nether_brick",
+    "particle": "bricks_and_beats:item/thrown_nether_brick"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        6.5,
+        5.5
+      ],
+      "to": [
+        13,
+        9.5,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#t"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#t"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            8,
+            6
+          ],
+          "texture": "#t"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            8,
+            6
+          ],
+          "texture": "#t"
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            16,
+            16
+          ],
+          "texture": "#t"
+        },
+        "down": {
+          "uv": [
+            0,
+            6,
+            16,
+            16
+          ],
+          "texture": "#t"
+        }
+      }
+    }
+  ],
+  "display": {
+    "ground": {
+      "rotation": [
+        25,
+        -35,
+        10
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "gui": {
+      "rotation": [
+        30,
+        -35,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        25,
+        -35,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    }
+  }
+}
