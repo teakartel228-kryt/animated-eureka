@@ -12,6 +12,9 @@ public final class ModItems {
 	public static final Item BRICK_SHARD = register("brick_shard", new Item.Properties());
 	public static final Item NETHER_BRICK_SHARD = register("nether_brick_shard", new Item.Properties());
 
+	/** Flying claw of the hook (renders the claw model; not obtainable, not in the creative tab). */
+	public static final Item HOOK_HEAD = register("hook_head", new Item.Properties());
+
 	// Songs are defined in data/bricks_and_beats/jukebox_song/*.json
 	public static final Item DISC_HAMMER_OF_JUSTICE = disc("music_disc_hammer_of_justice");
 	public static final Item DISC_ITS_TV_TIME = disc("music_disc_its_tv_time");

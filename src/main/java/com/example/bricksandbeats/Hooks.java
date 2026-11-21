@@ -176,7 +176,7 @@ public final class Hooks {
 			return InteractionResult.SUCCESS;
 		}
 		ps.lastFire = now;
-		HookEntity h = new HookEntity(sl, p, stack.copyWithCount(1));
+		HookEntity h = new HookEntity(sl, p, new ItemStack(ModItems.HOOK_HEAD));
 		h.lvl = lvl;
 		h.power = ench(stack, Enchantments.POWER);
 		h.range = lvl >= 4 ? 32 : 20;
@@ -370,10 +370,15 @@ public final class Hooks {
 				double max = 1.5 * k;
 				if (v.length() > max) v = v.normalize().scale(max);
 			} else {
-				v = v.scale(0.5).add(0, 0.08, 0);
+				v = v.scale(0.5).add(0, 0.039, 0); // close to the anchor: hang (0.039 cancels gravity at this damping)
 			}
 		} else {
-			v = v.scale(0.8).add(0, 0.08, 0); // two anchors: hang between the walls
+			// Two anchors (e.g. between two walls while falling): hang, with a soft pull toward the middle.
+			// 0.0627 cancels gravity at damping 0.8, so the player no longer drifts upwards.
+			Vec3 mid = g.get(0).anchor.add(g.get(1).anchor).scale(0.5);
+			Vec3 d = mid.subtract(p.getEyePosition());
+			v = v.scale(0.8).add(0, 0.0627, 0);
+			if (d.length() > 3.0) v = v.add(d.normalize().scale(0.05));
 		}
 		p.setDeltaMovement(v);
 		p.hurtMarked = true;

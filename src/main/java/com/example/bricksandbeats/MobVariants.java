@@ -47,10 +47,18 @@ public final class MobVariants {
 				mob.addTag("ba_rolled");
 				if (level.getRandom().nextFloat() < 0.12F) {
 					String[] pool = zombie ? ZOMBIE : SKELETON;
-					setup(mob, pool[level.getRandom().nextInt(pool.length)]);
+					mob.addTag(pool[level.getRandom().nextInt(pool.length)]);
 				}
 			}
-			if (isVariant(mob)) MOBS.add(mob);
+			// Variant tag comes from the random roll above or from a spawn egg (see VariantEggs).
+			String variant = variantTag(mob);
+			if (variant != null) {
+				if (!TagUtil.has(mob, "ba_setup")) {
+					mob.addTag("ba_setup");
+					setup(mob, variant);
+				}
+				MOBS.add(mob);
+			}
 		});
 		ServerEntityEvents.ENTITY_UNLOAD.register((e, level) -> {
 			if (e instanceof Mob m) {
@@ -67,10 +75,10 @@ public final class MobVariants {
 		return "minecraft".equals(id.getNamespace()) ? id.getPath() : "";
 	}
 
-	private static boolean isVariant(Mob mob) {
-		for (String t : ZOMBIE) if (TagUtil.has(mob, t)) return true;
-		for (String t : SKELETON) if (TagUtil.has(mob, t)) return true;
-		return false;
+	private static String variantTag(Mob mob) {
+		for (String t : ZOMBIE) if (TagUtil.has(mob, t)) return t;
+		for (String t : SKELETON) if (TagUtil.has(mob, t)) return t;
+		return null;
 	}
 
 	private static void setup(Mob mob, String tag) {

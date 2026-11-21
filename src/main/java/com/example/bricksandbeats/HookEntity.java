@@ -38,7 +38,7 @@ public class HookEntity extends ThrowableItemProjectile {
 
 	@Override
 	protected Item getDefaultItem() {
-		return HookRegistry.HOOKS[0];
+		return ModItems.HOOK_HEAD;
 	}
 
 	@Override

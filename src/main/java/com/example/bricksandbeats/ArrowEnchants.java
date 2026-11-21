@@ -123,28 +123,20 @@ public final class ArrowEnchants {
 	}
 
 	/**
-	 * Eternal Arrow: no gravity; whenever the arrow slows down (drag, water) its speed is boosted back to the
-	 * launch speed, so it never hangs or drops. After 8 seconds it becomes a normal arrow again.
+	 * Eternal Arrow: "No Gravity" is switched on from the first tick and never switched off. During the first
+	 * 8 seconds, whenever the arrow slows down (drag, water) its speed is boosted back to the launch speed.
 	 */
 	private static void eternal(AbstractArrow a) {
+		a.setNoGravity(true);
 		Vec3 v = a.getDeltaMovement();
 		double speed = v.length();
 		Double launch = ETERNAL.get(a);
 		if (launch == null) {
 			if (speed < 0.1) return;
 			ETERNAL.put(a, Math.max(speed, 1.5));
-			a.setNoGravity(true);
 			return;
 		}
-		if (a.tickCount > 160) {
-			a.setNoGravity(false);
-			a.addTag("ba_eternal_done");
-			a.removeTag("ba_eternal");
-			ETERNAL.remove(a);
-			return;
-		}
-		if (speed < 0.1) return; // landed
-		a.setNoGravity(true);
+		if (a.tickCount > 160 || speed < 0.1) return; // boost phase over, or landed
 		if (speed < launch * 0.85 || v.y < -0.02) {
 			a.setDeltaMovement(v.normalize().scale(launch));
 			a.hurtMarked = true;
