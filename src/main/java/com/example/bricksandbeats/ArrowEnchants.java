@@ -69,24 +69,26 @@ public final class ArrowEnchants {
 				ETERNAL.remove(a);
 				continue;
 			}
-			Set<String> tags = a.getTags();
-			if (tags.isEmpty()) continue;
+			boolean amethyst = TagUtil.has(a, "ba_amethyst");
+			boolean ultra = TagUtil.has(a, "ba_ultra");
+			boolean eternal = TagUtil.has(a, "ba_eternal");
+			if (!amethyst && !ultra && !eternal) continue;
 
 			// Cooldown for the heavy enchantments (once per arrow).
-			if ((tags.contains("ba_amethyst") || tags.contains("ba_ultra")) && !tags.contains("ba_cd")) {
+			if ((amethyst || ultra) && !TagUtil.has(a, "ba_cd")) {
 				a.addTag("ba_cd");
 				ItemStack weapon = a.getWeaponItem();
 				if (a.getOwner() instanceof Player p && weapon != null && !weapon.isEmpty()) {
-					p.getCooldowns().addCooldown(weapon, tags.contains("ba_amethyst") ? 80 : 40);
+					p.getCooldowns().addCooldown(weapon, amethyst ? 80 : 40);
 				}
 			}
 
-			if (tags.contains("ba_amethyst")) {
+			if (amethyst) {
 				amethyst(level, a);
-			} else if (tags.contains("ba_ultra")) {
+			} else if (ultra) {
 				ultra(level, a);
 			}
-			if (tags.contains("ba_eternal")) {
+			if (eternal) {
 				eternal(a);
 			}
 		}
@@ -104,10 +106,7 @@ public final class ArrowEnchants {
 
 	/** Ultra Power: pierces mobs and smashes weak blocks (targets, glass, leaves...). */
 	private static void ultra(ServerLevel level, AbstractArrow a) {
-		if (!a.getTags().contains("ba_ultra_set")) {
-			a.addTag("ba_ultra_set");
-			a.setPierceLevel((byte) 6);
-		}
+		// Piercing (6 mobs) comes from the minecraft:projectile_piercing effect in enchantment/ultra_power.json.
 		Vec3 v = a.getDeltaMovement();
 		if (v.lengthSqr() < 0.04) return; // stuck in a block
 		for (double f : new double[]{0.0, 0.5, 1.0, 1.5}) {

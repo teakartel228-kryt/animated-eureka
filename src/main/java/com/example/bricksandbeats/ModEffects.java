@@ -1,6 +1,5 @@
 package com.example.bricksandbeats;
 
-import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
@@ -13,9 +12,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.Potions;
 
 /** New effects: Rhythm (speed), Brick Skin (tank), Fragility (curse), Chaos (random effects). */
 public final class ModEffects {
@@ -68,13 +65,8 @@ public final class ModEffects {
 				new Potion(name, new MobEffectInstance(effect, ticks)));
 	}
 
+	/** Touching the class registers the effects and potions; brewing recipes are added by PotionBrewingMixin. */
 	public static void init() {
-		FabricBrewingRecipeRegistryBuilder.BUILD.register(b -> {
-			b.registerPotionRecipe(Potions.AWKWARD, Items.NOTE_BLOCK, RHYTHM_POTION);
-			b.registerPotionRecipe(Potions.AWKWARD, Items.BRICK, BRICK_SKIN_POTION);
-			b.registerPotionRecipe(Potions.AWKWARD, Items.NETHER_BRICK, FRAGILITY_POTION);
-			b.registerPotionRecipe(Potions.AWKWARD, Items.AMETHYST_SHARD, CHAOS_POTION);
-		});
 	}
 
 	private ModEffects() {}

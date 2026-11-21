@@ -10,9 +10,12 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BricksAndBeats implements ModInitializer {
 	public static final String MOD_ID = "bricks_and_beats";
+	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(MOD_ID, path);
@@ -26,7 +29,10 @@ public class BricksAndBeats implements ModInitializer {
 		ModEffects.init();
 		ArrowEnchants.init();
 		MobVariants.init();
+		HookRegistry.init();
 		ModTab.init();
+
+		UseItemCallback.EVENT.register(Hooks::use);
 
 		// Right click with a brick / nether brick -> throw it.
 		UseItemCallback.EVENT.register((player, level, hand) -> {

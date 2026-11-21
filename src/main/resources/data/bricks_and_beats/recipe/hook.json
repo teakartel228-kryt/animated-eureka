@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "CHC",
+    "IRI",
+    "I  "
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "H": "minecraft:chain",
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "bricks_and_beats:hook",
+    "count": 1
+  }
+}

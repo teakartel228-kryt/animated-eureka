@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "minecraft:chain",
+  "base": "bricks_and_beats:hook_3",
+  "addition": "minecraft:diamond",
+  "result": {
+    "id": "bricks_and_beats:hook_4",
+    "count": 1
+  }
+}
