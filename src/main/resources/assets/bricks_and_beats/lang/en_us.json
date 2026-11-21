@@ -32,5 +32,16 @@
   "mob.bricks_and_beats.dynamiter": "Dynamiter",
   "mob.bricks_and_beats.bard": "Bard Skeleton",
   "mob.bricks_and_beats.amethyst_shooter": "Amethyst Shooter",
-  "mob.bricks_and_beats.ink_skeleton": "Ink Skeleton"
+  "mob.bricks_and_beats.ink_skeleton": "Ink Skeleton",
+  "entity.bricks_and_beats.hook": "Hook",
+  "message.bricks_and_beats.emergency": "Target too heavy! Emergency pullback!",
+  "enchantment.bricks_and_beats.hook_hands": "Hook Hands",
+  "enchantment.bricks_and_beats.redstone_hook": "Redstone Hook",
+  "enchantment.bricks_and_beats.defensive_mechanism": "Defensive Mechanism",
+  "item.bricks_and_beats.hook": "Hook",
+  "item.bricks_and_beats.hook_1": "Hook (upgrade 1)",
+  "item.bricks_and_beats.hook_2": "Hook (upgrade 2)",
+  "item.bricks_and_beats.hook_3": "Hook (upgrade 3)",
+  "item.bricks_and_beats.hook_4": "Hook (upgrade 4)",
+  "item.bricks_and_beats.hook_5": "Hook (upgrade 5)"
 }
