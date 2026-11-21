@@ -35,3 +35,4 @@ Items hook, hook_1..hook_5 (smithing: template chain, base = previous hook, addi
 Hooks are now a 3D grapple gun with chain and copper claw in hand / on the ground (models/item/hook_gun*.json, one texture per level);
 the inventory and item frames keep the flat icons. The flying claw is the hidden item `hook_head`.
 If the gun looks wrongly held, tweak the `display` block of models/item/hook_gun.json (or edit it in Blockbench).
+Привет это текст чтобы гитхаб собрал мне мод 
