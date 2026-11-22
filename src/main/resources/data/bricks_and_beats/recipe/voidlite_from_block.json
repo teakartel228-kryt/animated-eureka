@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "bricks_and_beats:voidlite_block"
+  ],
+  "result": {
+    "id": "bricks_and_beats:voidlite",
+    "count": 9
+  }
+}

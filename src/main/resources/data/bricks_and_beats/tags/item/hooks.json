@@ -1,11 +1,12 @@
 {
-  "replace": false,
-  "values": [
-    "bricks_and_beats:hook",
-    "bricks_and_beats:hook_1",
-    "bricks_and_beats:hook_2",
-    "bricks_and_beats:hook_3",
-    "bricks_and_beats:hook_4",
-    "bricks_and_beats:hook_5"
-  ]
+ "replace": false,
+ "values": [
+  "bricks_and_beats:hook",
+  "bricks_and_beats:hook_1",
+  "bricks_and_beats:hook_2",
+  "bricks_and_beats:hook_3",
+  "bricks_and_beats:hook_4",
+  "bricks_and_beats:hook_5",
+  "bricks_and_beats:hook_6"
+ ]
 }

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "VVV",
+    "VVV",
+    "VVV"
+  ],
+  "key": {
+    "V": "bricks_and_beats:voidlite"
+  },
+  "result": {
+    "id": "bricks_and_beats:voidlite_block",
+    "count": 1
+  }
+}

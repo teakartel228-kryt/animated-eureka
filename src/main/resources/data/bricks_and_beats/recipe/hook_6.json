@@ -1,0 +1,10 @@
+{
+ "type": "minecraft:smithing_transform",
+ "template": "minecraft:chain",
+ "base": "bricks_and_beats:hook_5",
+ "addition": "bricks_and_beats:voidlite",
+ "result": {
+  "id": "bricks_and_beats:hook_6",
+  "count": 1
+ }
+}

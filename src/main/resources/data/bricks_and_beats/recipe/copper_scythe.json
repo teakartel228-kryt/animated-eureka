@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "III",
+    "  S",
+    "  S"
+  ],
+  "key": {
+    "I": "minecraft:copper_ingot",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "bricks_and_beats:copper_scythe",
+    "count": 1
+  }
+}

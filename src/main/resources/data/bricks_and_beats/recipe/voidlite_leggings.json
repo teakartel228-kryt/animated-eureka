@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "VVV",
+    "V V",
+    "V V"
+  ],
+  "key": {
+    "V": "bricks_and_beats:voidlite"
+  },
+  "result": {
+    "id": "bricks_and_beats:voidlite_leggings",
+    "count": 1
+  }
+}
