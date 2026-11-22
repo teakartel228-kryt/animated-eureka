@@ -377,13 +377,13 @@ public final class MobVariants {
 			}
 			case "ba_mob_rogue" -> {
 				name(mob, "rogue");
-				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.BLACK_WOOL));
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.COAL_BLOCK));
 				mob.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3);
 				hp.setBaseValue(20);
 			}
 			case "ba_mob_gale" -> {
 				name(mob, "gale_skeleton");
-				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.WHITE_WOOL));
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.SNOW_BLOCK));
 				hp.setBaseValue(22);
 			}
 			case "ba_mob_soul" -> {

@@ -67,7 +67,7 @@ public final class Gravitites {
 			if (!(level instanceof ServerLevel sl)) return InteractionResult.SUCCESS;
 			ItemStack stack = player.getItemInHand(hand);
 			if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
-			boolean flipped = player.getTags().contains(TAG_HEAVY) || player.getTags().contains(TAG_LIGHT);
+			boolean flipped = TagUtil.has(player, TAG_HEAVY) || TagUtil.has(player, TAG_LIGHT);
 			// VVVVVV rule: you can only flip while standing on a surface (floor, or ceiling when flipped)
 			boolean grounded = flipped ? touchingCeiling(player) : touchingFloor(player);
 			if (!grounded || player.isInWater() || player.isInLava()) return InteractionResult.FAIL;
@@ -84,12 +84,19 @@ public final class Gravitites {
 	}
 
 	public static void init() {
+		// dropped gravitites are indestructible (replaces the custom damage-resistant tag, whose component API changed)
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+			if (entity instanceof net.minecraft.world.entity.item.ItemEntity ie) {
+				ItemStack st = ie.getItem();
+				if (st.is(ModItems.HEAVY_GRAVITITE) || st.is(ModItems.LIGHT_GRAVITITE)) ie.setInvulnerable(true);
+			}
+		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			for (Player p : server.getPlayerList().getPlayers()) {
 				AttributeInstance g = p.getAttribute(Attributes.GRAVITY);
 				if (g == null) continue;
-				boolean heavy = p.getTags().contains(TAG_HEAVY);
-				boolean light = p.getTags().contains(TAG_LIGHT);
+				boolean heavy = TagUtil.has(p, TAG_HEAVY);
+				boolean light = TagUtil.has(p, TAG_LIGHT);
 				AttributeModifier cur = g.getModifier(FLIP);
 				// base gravity 0.08: x(1 + m) -> -0.16 (heavy) / -0.04 (light)
 				double want = heavy ? -3.0 : light ? -1.5 : 0.0;
