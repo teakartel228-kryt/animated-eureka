@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "bricks_and_beats:iron_dagger",
+    "bricks_and_beats:golden_dagger",
+    "bricks_and_beats:diamond_dagger"
+  ]
+}

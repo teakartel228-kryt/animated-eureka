@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "#bricks_and_beats:dagger_items",
+    {
+      "id": "#minecraft:swords",
+      "required": false
+    }
+  ]
+}

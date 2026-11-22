@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "bricks_and_beats:copper_trap",
+    "bricks_and_beats:iron_trap",
+    "bricks_and_beats:copper_spikes",
+    "bricks_and_beats:iron_spikes",
+    "bricks_and_beats:diamond_spikes",
+    "bricks_and_beats:hidden_spikes",
+    "bricks_and_beats:chunk_loader"
+  ]
+}

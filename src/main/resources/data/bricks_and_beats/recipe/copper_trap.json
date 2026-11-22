@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "C C",
+    "CHC"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "H": "minecraft:tripwire_hook"
+  },
+  "result": {
+    "id": "bricks_and_beats:copper_trap",
+    "count": 1
+  }
+}

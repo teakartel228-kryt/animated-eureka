@@ -14,6 +14,10 @@
     "bricks_and_beats:defensive_mechanism",
     "bricks_and_beats:piston_power",
     "bricks_and_beats:sticky_piston",
-    "bricks_and_beats:piston_recoil"
+    "bricks_and_beats:piston_recoil",
+    "bricks_and_beats:strike",
+    "bricks_and_beats:trimming",
+    "bricks_and_beats:cutthroat",
+    "bricks_and_beats:magma_walker"
   ]
 }

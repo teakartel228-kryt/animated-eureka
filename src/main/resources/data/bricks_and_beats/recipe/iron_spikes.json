@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " I ",
+    "IPI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "P": "minecraft:stone_pressure_plate"
+  },
+  "result": {
+    "id": "bricks_and_beats:iron_spikes",
+    "count": 2
+  }
+}

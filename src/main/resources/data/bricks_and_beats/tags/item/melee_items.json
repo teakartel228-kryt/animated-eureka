@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "#bricks_and_beats:dagger_items",
+    "#bricks_and_beats:scythe_items",
+    {
+      "id": "#minecraft:swords",
+      "required": false
+    },
+    {
+      "id": "#minecraft:axes",
+      "required": false
+    },
+    {
+      "id": "minecraft:mace",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " C ",
+    "CPC"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "P": "minecraft:stone_pressure_plate"
+  },
+  "result": {
+    "id": "bricks_and_beats:copper_spikes",
+    "count": 2
+  }
+}

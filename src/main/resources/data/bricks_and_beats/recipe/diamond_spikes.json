@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " D ",
+    "DPD"
+  ],
+  "key": {
+    "D": "minecraft:diamond",
+    "P": "minecraft:stone_pressure_plate"
+  },
+  "result": {
+    "id": "bricks_and_beats:diamond_spikes",
+    "count": 1
+  }
+}

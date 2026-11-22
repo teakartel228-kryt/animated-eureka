@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:arrow",
+    "minecraft:arrow",
+    "minecraft:arrow",
+    "minecraft:arrow",
+    "minecraft:phantom_membrane"
+  ],
+  "result": {
+    "id": "bricks_and_beats:phantom_arrow",
+    "count": 4
+  }
+}

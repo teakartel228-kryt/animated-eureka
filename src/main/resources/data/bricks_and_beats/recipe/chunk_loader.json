@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "OEO",
+    "EDE",
+    "OEO"
+  ],
+  "key": {
+    "O": "minecraft:obsidian",
+    "E": "minecraft:ender_eye",
+    "D": "minecraft:diamond"
+  },
+  "result": {
+    "id": "bricks_and_beats:chunk_loader",
+    "count": 1
+  }
+}
