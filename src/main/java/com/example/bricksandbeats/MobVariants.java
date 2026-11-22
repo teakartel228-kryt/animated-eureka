@@ -189,7 +189,7 @@ public final class MobVariants {
 			if (!(world instanceof ServerLevel level)) return InteractionResult.SUCCESS;
 			ItemStack held = player.getItemInHand(hand);
 			if (!held.is(Items.EMERALD)) {
-				player.displayClientMessage(Component.translatable("message.bricks_and_beats.shop_need_emerald"), true);
+				if (player instanceof net.minecraft.server.level.ServerPlayer sp) sp.sendSystemMessage(Component.translatable("message.bricks_and_beats.shop_need_emerald"), true);
 				return InteractionResult.SUCCESS;
 			}
 			held.consume(1, player);
@@ -329,7 +329,7 @@ public final class MobVariants {
 			}
 			case "ba_mob_acid" -> {
 				name(mob, "acid");
-				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LIME_CONCRETE));
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.SLIME_BLOCK));
 				hp.setBaseValue(26);
 			}
 			case "ba_mob_runner" -> {
@@ -356,7 +356,7 @@ public final class MobVariants {
 			}
 			case "ba_mob_storm" -> {
 				name(mob, "storm_skeleton");
-				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.LIGHTNING_ROD));
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace("lightning_rod"))));
 				hp.setBaseValue(28);
 			}
 			case "ba_mob_big" -> {

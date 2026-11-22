@@ -17,7 +17,7 @@ public final class CustomArrows {
 		@Override
 		public AbstractArrow createArrow(Level level, ItemStack ammo, LivingEntity owner, ItemStack weapon) {
 			AbstractArrow a = super.createArrow(level, ammo, owner, weapon);
-			a.setBaseDamage(a.getBaseDamage() + 1.5);
+			a.setBaseDamage(2.0 + 1.5); // vanilla arrow base damage is 2.0
 			a.addTag("ba_copper_arrow");
 			return a;
 		}
@@ -32,7 +32,7 @@ public final class CustomArrows {
 		public AbstractArrow createArrow(Level level, ItemStack ammo, LivingEntity owner, ItemStack weapon) {
 			AbstractArrow a = super.createArrow(level, ammo, owner, weapon);
 			a.setNoGravity(true);
-			a.setPierceLevel((byte) 3);
+			((com.example.bricksandbeats.mixin.AbstractArrowAccessor) a).bricksandbeats$setPierceLevel((byte) 3);
 			a.addTag("ba_phantom_arrow");
 			return a;
 		}
