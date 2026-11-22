@@ -24,6 +24,7 @@ public class BricksAndBeats implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModItems.init();
+		ModBlocks.init();
 		ModEntities.init();
 		FurnaceDynamite.init();
 		ModEffects.init();
@@ -33,6 +34,10 @@ public class BricksAndBeats implements ModInitializer {
 		Fx.init();
 		HandPiston.init();
 		MobAbilities.init();
+		Stages.init();
+		Hazards.init();
+		ChunkLoaders.init();
+		NewEnchants.init();
 		ModTab.init();
 
 		UseItemCallback.EVENT.register(Hooks::use);

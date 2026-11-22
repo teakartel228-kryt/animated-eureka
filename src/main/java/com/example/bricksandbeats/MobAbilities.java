@@ -91,7 +91,7 @@ public final class MobAbilities {
 				continue;
 			}
 			// --- tools (zombies only; the old breaker variants keep their own logic)
-			if (zombie(mob) && !MobVariants.isBlockBreaker(mob) && held.isDamageableItem()) dig(sl, mob, target, held);
+			if (zombie(mob) && !MobVariants.isBlockBreaker(mob) && !Stages.isStageMob(mob) && held.isDamageableItem()) dig(sl, mob, target, held);
 		}
 	}
 

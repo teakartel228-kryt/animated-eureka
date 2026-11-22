@@ -16,7 +16,7 @@ If `ThrowableItemProjectile` fails to import, change the package in ThrownBrick.
 
 ## v1.1 additions
 * Enchantments (all appear in the enchanting table): Eternal Arrow (arrow never drops, speed is boosted back when it slows, max 8 s), Ink Shot (blindness), Musical Weapon (25% area damage, all weapons incl. bows), Chaos Strike (melee) / Far Chaos (bow, crossbow) - 20% random effect, Shield Breaker (15%), Amethyst Spray (crossbow shotgun, slow reload, knockback follows aim up/down, recoil throws the shooter back (shoot down = boost up, sneak = no recoil); incompatible with Quick Charge, Multishot, Eternal Arrow, Ultra Power), Ultra Power (bow/crossbow: pierces mobs, smashes weak blocks and targets, cooldown; incompatible with Quick Charge, Multishot, Amethyst Spray).
-* Variant mobs (~12% of zombies/skeletons): Brick Thrower, Dynamiter, Bard Skeleton, Amethyst Shooter, Ink Skeleton.
+* Variant mobs (~12% of zombies/skeletons, see "Variant mobs" below).
 * Effects/potions: Rhythm, Brick Skin, Fragility, Chaos (brew on an Awkward Potion with note block / brick / nether brick / amethyst shard).
 * Creative tab "Bricks & Beats". Effect icons: textures/mob_effect/*.png (placeholders, replace them).
 * If AbstractArrow fails to import, change the package in ArrowEnchants.java (IDE auto-import).
@@ -57,3 +57,16 @@ Wooden / stone / iron / golden / diamond / netherite staff (right click; recipe:
 * Hand Piston (`bricks_and_beats:hand_piston`) + enchantments Piston Power, Sticky Piston, Jet Recoil. No recoil while sneaking.
 * Spawn eggs for plain zombie / plain skeleton (no variant roll), hooker zombie / skeleton.
 * Tipped arrows / splash / lingering potions of the mod's effects are translated.
+
+
+## Variant mobs, tiers and spawn eggs (v1.6)
+Zombies: Brick Thrower, Dynamiter, Necromancer, Breaker, Miner, Ram, Digger, Hammer, Acid, Bulwark, Runner, Plague, Hooker.
+Skeletons: Bard, Amethyst Shooter, Ink, Frost, Fire, Venom, Sniper, Storm, Hooker.
+
+* Block breaking differs per zombie: Breaker (slow punch), Miner (fast, stone and ore), Ram (3-block-tall walls), Digger (digs down), Hammer (ground slam crushes blocks around it and launches players), Acid (slowly dissolves the block in its way, no drops), Dynamiter (tier II+ explosion really breaks blocks). Any zombie holding a tool also digs what that tool is good at.
+* Power tiers: I weak, II strong, III elite. Tier II/III: more health and damage, helmet / diamond armor, shorter ability cooldowns, stronger effects. Natural spawns roll 70 % / 24 % / 6 %.
+* Spawn eggs: one egg per mob and tier (plus plain zombie / skeleton). Each egg has its own icon (face of the base mob, coloured hat band and a symbol of the ability), a frame in the tier colour (green / orange / red), and a tooltip with the base mob, what it does and the tier. In the creative tab: all zombies tier I-III, then all skeletons tier I-III.
+* Hooker zombie / skeleton now really carry a hook (tier I plain, II level 2, III level 4) and pull their target in.
+
+## Hand Piston (v1.6)
+Left click: quick jab. Right click: punch along the exact look direction; hold to charge (tap / half / full: reach 2 / 4 / 6 blocks, more damage and knockback). It pushes the first block like a vanilla piston and throws you back opposite to the aim (shoot down = launch up; sneak = no recoil). Enchantments: Piston Power, Sticky Piston, Jet Recoil.

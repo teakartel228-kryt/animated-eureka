@@ -1,6 +1,12 @@
 package com.example.bricksandbeats;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import java.util.function.Function;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -28,6 +34,30 @@ public final class ModItems {
 	/** Flying claw of the hook (renders the claw model; not obtainable, not in the creative tab). */
 	public static final Item HOOK_HEAD = register("hook_head", new Item.Properties());
 
+	// daggers: fast, backstab bonus. scythes: slow, hit everything around the target.
+	public static final Item[] DAGGERS = {
+			weapon("iron_dagger", 3.0, -1.0, 250, 14, Rarity.COMMON),
+			weapon("golden_dagger", 2.0, -1.0, 32, 22, Rarity.UNCOMMON),
+			weapon("diamond_dagger", 4.0, -1.0, 1561, 10, Rarity.RARE),
+	};
+	public static final Item[] SCYTHES = {
+			weapon("iron_scythe", 6.0, -3.0, 250, 14, Rarity.COMMON),
+			weapon("golden_scythe", 4.0, -3.0, 32, 22, Rarity.UNCOMMON),
+			weapon("diamond_scythe", 7.0, -3.0, 1561, 10, Rarity.RARE),
+	};
+
+	public static final Item COPPER_ARROW = register("copper_arrow", new Item.Properties(), CustomArrows.CopperArrow::new);
+	public static final Item PHANTOM_ARROW = register("phantom_arrow", new Item.Properties().rarity(Rarity.UNCOMMON), CustomArrows.PhantomArrow::new);
+
+	private static Item weapon(String name, double dmg, double speed, int durability, int enchantability, Rarity rarity) {
+		ItemAttributeModifiers mods = ItemAttributeModifiers.builder()
+				.add(Attributes.ATTACK_DAMAGE, new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, dmg, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+				.add(Attributes.ATTACK_SPEED, new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, speed, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+				.build();
+		return register(name, new Item.Properties().durability(durability).enchantable(enchantability).rarity(rarity)
+				.component(DataComponents.ATTRIBUTE_MODIFIERS, mods), Item::new);
+	}
+
 	// Songs are defined in data/bricks_and_beats/jukebox_song/*.json
 	public static final Item DISC_HAMMER_OF_JUSTICE = disc("music_disc_hammer_of_justice");
 	public static final Item DISC_ITS_TV_TIME = disc("music_disc_its_tv_time");
@@ -42,6 +72,11 @@ public final class ModItems {
 
 	private static Item register(String name, Item.Properties properties) {
 		return register(name, properties, false);
+	}
+
+	private static Item register(String name, Item.Properties properties, Function<Item.Properties, Item> factory) {
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, BricksAndBeats.id(name));
+		return Registry.register(BuiltInRegistries.ITEM, key, factory.apply(properties.setId(key)));
 	}
 
 	private static Item register(String name, Item.Properties properties, boolean piston) {

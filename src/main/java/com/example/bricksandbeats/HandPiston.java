@@ -29,16 +29,17 @@ import java.util.Map;
 
 /**
  * Hand Piston (idea: the "Against Minecraft" animation, episode 1).
- *  - left click: damage + knockback
- *  - right click: shoot the piston head in the looked-at direction (6 directions); hold to charge (1 s)
- *  - charged: 2x knockback, 2x longer head, 1.5x recoil
- *  - the shot pushes every block a vanilla piston could push (PistonStructureResolver) and throws you back
- *    the other way - except while sneaking.
+ *  - left click: quick jab, damage + knockback
+ *  - right click: punch along the exact look direction; hold to charge (3 stages: tap / half / full = reach 2 / 4 / 6 blocks,
+ *    damage and knockback grow with the stage)
+ *  - the punch pushes the first block it meets like a vanilla piston (PistonStructureResolver)
+ *  - recoil throws you opposite to the aim (shoot down = launch up, rocket jump), except while sneaking
  * Enchantments: Piston Power (+50 % damage / knockback per level), Sticky Piston (pulls targets instead),
- * Jet Recoil (+60 % recoil per level, for rocket-jumping).
+ * Jet Recoil (+60 % recoil per level).
  */
 public final class HandPiston {
-	public static final int CHARGE_TICKS = 20;
+	public static final int MID_TICKS = 10;   // half charge
+	public static final int CHARGE_TICKS = 25; // full charge
 
 	/** Item with a charge-up use animation. */
 	public static class PistonItem extends Item {
@@ -61,7 +62,7 @@ public final class HandPiston {
 		public boolean releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
 			if (level instanceof ServerLevel sl && entity instanceof Player p) {
 				int used = getUseDuration(stack, entity) - timeLeft;
-				shoot(sl, p, stack, used >= CHARGE_TICKS);
+				shoot(sl, p, stack, used >= CHARGE_TICKS ? 2 : used >= MID_TICKS ? 1 : 0);
 			}
 			return true;
 		}
@@ -99,6 +100,8 @@ public final class HandPiston {
 				if (used == CHARGE_TICKS) {
 					sl.playSound(null, p.blockPosition(), SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 0.8F, 1.8F);
 					sl.sendParticles(ParticleTypes.CRIT, p.getX(), p.getEyeY(), p.getZ(), 8, 0.4, 0.3, 0.4, 0.1);
+				} else if (used == MID_TICKS) {
+					sl.playSound(null, p.blockPosition(), SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 0.5F, 1.4F);
 				} else if (used > 0 && used < CHARGE_TICKS && used % 5 == 0) {
 					sl.sendParticles(ParticleTypes.SMOKE, p.getX(), p.getEyeY() - 0.4, p.getZ(), 2, 0.2, 0.1, 0.2, 0.01);
 				}
@@ -106,16 +109,17 @@ public final class HandPiston {
 		});
 	}
 
-	static void shoot(ServerLevel sl, Player p, ItemStack stack, boolean charged) {
+	static void shoot(ServerLevel sl, Player p, ItemStack stack, int stage) {
 		if (p.getCooldowns().isOnCooldown(stack)) return;
-		Vec3 look = p.getLookAngle();
+		boolean charged = stage >= 1;
+		Vec3 look = p.getLookAngle().normalize();
+		// the blocks and the visual head use the nearest axis, the hit and the recoil use the exact look vector
 		Direction dir = Direction.getApproximateNearest(look.x, look.y, look.z);
-		Vec3 d = new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
 		int power = Hooks.ench(stack, "piston_power");
 		int recoil = Hooks.ench(stack, "piston_recoil");
 		boolean sticky = Hooks.ench(stack, "sticky_piston") > 0;
-		int len = charged ? 4 : 2;                           // head length in blocks (charged = 2x)
-		float mult = (charged ? 2.0F : 1.0F) * (1.0F + 0.5F * power);
+		int len = stage == 2 ? 6 : stage == 1 ? 4 : 2;          // reach in blocks: tap / half charge / full charge
+		float mult = (1.0F + 0.8F * stage) * (1.0F + 0.5F * power);
 
 		// cell the shot starts from: eye level (feet level when shooting down)
 		BlockPos origin = dir == Direction.DOWN ? p.blockPosition() : BlockPos.containing(p.getEyePosition());
@@ -130,22 +134,27 @@ public final class HandPiston {
 			break;
 		}
 
-		// entities in the line of the head
-		Vec3 start = dir == Direction.DOWN ? p.position() : p.getEyePosition();
-		AABB zone = new AABB(start, start.add(d.scale(len + 0.6))).inflate(0.7);
-		List<Entity> hit = new ArrayList<>(sl.getEntitiesOfClass(LivingEntity.class, zone, e -> e != p && e.isAlive() && !MobVariants.isMinion(e)));
-		for (Entity e : hit) {
-			if (e instanceof LivingEntity le) le.hurtServer(sl, sl.damageSources().playerAttack(p), (charged ? 6.0F : 3.0F) * (1.0F + 0.5F * power));
-			double k = 1.0 * mult * (sticky ? -0.8 : 1.0);
-			e.push(d.x * k, d.y * k + (dir.getAxis().isHorizontal() ? 0.25 : 0.0), d.z * k);
+		// entities: everything close to the aim line (works in any direction, not only along the axes)
+		Vec3 start = p.getEyePosition();
+		double range = Math.min(len, reach + 1) + 0.6;
+		AABB zone = new AABB(start, start.add(look.scale(range))).inflate(1.2);
+		for (LivingEntity e : sl.getEntitiesOfClass(LivingEntity.class, zone, x -> x != p && x.isAlive() && !MobVariants.isMinion(x))) {
+			Vec3 c = e.getBoundingBox().getCenter();
+			double t = Math.max(0.0, Math.min(range, c.subtract(start).dot(look)));
+			double r = 0.7 + e.getBbWidth() * 0.5;
+			if (start.add(look.scale(t)).distanceToSqr(c) > r * r) continue;
+			e.hurtServer(sl, sl.damageSources().playerAttack(p), (3.0F + 2.5F * stage) * (1.0F + 0.5F * power));
+			double k = 0.9 * mult * (sticky ? -0.7 : 1.0);
+			e.push(look.x * k, look.y * k + 0.25, look.z * k);
 			e.hurtMarked = true;
 		}
 
-		// recoil: thrown the opposite way unless sneaking
+		// recoil: thrown opposite to the exact aim (shoot down = launch up), none while sneaking
 		if (!p.isShiftKeyDown()) {
-			double r = (charged ? 1.2 : 0.8) * (1.0 + 0.6 * recoil);
+			double r = (0.6 + 0.4 * stage) * (1.0 + 0.6 * recoil);
 			Vec3 v = p.getDeltaMovement();
-			p.setDeltaMovement(v.x - d.x * r, v.y - d.y * r + (dir.getAxis().isHorizontal() ? 0.12 : 0.0), v.z - d.z * r);
+			double hop = p.onGround() && look.y > -0.5 ? 0.1 : 0.0;
+			p.setDeltaMovement(v.x - look.x * r, v.y - look.y * r + hop, v.z - look.z * r);
 			p.hurtMarked = true;
 			p.resetFallDistance();
 		}
@@ -165,7 +174,7 @@ public final class HandPiston {
 			for (Entity h : heads) if (!h.isRemoved()) h.discard();
 			sl.playSound(null, p.blockPosition(), SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 0.7F, 1.0F);
 		});
-		p.getCooldowns().addCooldown(stack, charged ? 30 : 14);
+		p.getCooldowns().addCooldown(stack, stage == 2 ? 30 : stage == 1 ? 20 : 12);
 		p.swing(InteractionHand.MAIN_HAND);
 	}
 
