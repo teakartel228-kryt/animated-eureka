@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "bricks_and_beats:item/golden_dagger"
+  }
+}
