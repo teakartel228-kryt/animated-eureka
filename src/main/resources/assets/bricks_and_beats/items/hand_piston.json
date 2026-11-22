@@ -1,6 +1,52 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "bricks_and_beats:item/hand_piston"
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": [
+          "gui",
+          "fixed",
+          "ground"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "bricks_and_beats:item/hand_piston_icon"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:condition",
+      "property": "minecraft:using_item",
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "bricks_and_beats:item/hand_piston"
+      },
+      "on_true": {
+        "type": "minecraft:range_dispatch",
+        "property": "minecraft:use_duration",
+        "scale": 1.0,
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "bricks_and_beats:item/hand_piston"
+        },
+        "entries": [
+          {
+            "threshold": 10,
+            "model": {
+              "type": "minecraft:model",
+              "model": "bricks_and_beats:item/hand_piston_1"
+            }
+          },
+          {
+            "threshold": 25,
+            "model": {
+              "type": "minecraft:model",
+              "model": "bricks_and_beats:item/hand_piston_2"
+            }
+          }
+        ]
+      }
+    }
   }
 }
