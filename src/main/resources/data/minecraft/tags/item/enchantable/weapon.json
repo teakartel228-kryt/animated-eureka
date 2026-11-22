@@ -4,8 +4,10 @@
     "bricks_and_beats:iron_dagger",
     "bricks_and_beats:golden_dagger",
     "bricks_and_beats:diamond_dagger",
+    "bricks_and_beats:copper_dagger",
     "bricks_and_beats:iron_scythe",
     "bricks_and_beats:golden_scythe",
-    "bricks_and_beats:diamond_scythe"
+    "bricks_and_beats:diamond_scythe",
+    "bricks_and_beats:copper_scythe"
   ]
 }

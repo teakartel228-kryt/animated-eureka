@@ -7,6 +7,8 @@
     "bricks_and_beats:iron_spikes",
     "bricks_and_beats:diamond_spikes",
     "bricks_and_beats:hidden_spikes",
-    "bricks_and_beats:chunk_loader"
+    "bricks_and_beats:chunk_loader",
+    "bricks_and_beats:weakened_voidlite_ore",
+    "bricks_and_beats:voidlite_block"
   ]
 }
