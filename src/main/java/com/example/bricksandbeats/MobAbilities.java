@@ -150,7 +150,7 @@ public final class MobAbilities {
 		mob.getLookControl().setLookAt(d.pos.getX() + 0.5, d.pos.getY() + 0.5, d.pos.getZ() + 0.5);
 		float hardness = s.getDestroySpeed(sl, d.pos);
 		float speed = tool.getDestroySpeed(s);
-		d.progress += hardness <= 0.0F ? 1.0F : speed / hardness / 30.0F;
+		d.progress += hardness <= 0.0F ? 1.0F : BlockBreaking.perTick(sl, d.pos, s, speed);
 		if (mob.tickCount % 6 == 0) mob.swing(InteractionHand.MAIN_HAND);
 		if (d.progress < 1.0F) {
 			sl.destroyBlockProgress(mob.getId(), d.pos, (int) (d.progress * 10.0F));

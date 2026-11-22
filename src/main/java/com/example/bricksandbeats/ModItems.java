@@ -6,6 +6,9 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.DamageResistant;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import java.util.function.Function;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +16,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.item.equipment.ArmorType;
 
 public final class ModItems {
 	public static final Item BRICK_SHARD = register("brick_shard", new Item.Properties());
@@ -39,12 +44,39 @@ public final class ModItems {
 			weapon("iron_dagger", 3.0, -1.0, 250, 14, Rarity.COMMON),
 			weapon("golden_dagger", 2.0, -1.0, 32, 22, Rarity.UNCOMMON),
 			weapon("diamond_dagger", 4.0, -1.0, 1561, 10, Rarity.RARE),
+			weapon("copper_dagger", 2.5, -1.0, 190, 12, Rarity.COMMON),
 	};
 	public static final Item[] SCYTHES = {
 			weapon("iron_scythe", 6.0, -3.0, 250, 14, Rarity.COMMON),
 			weapon("golden_scythe", 4.0, -3.0, 32, 22, Rarity.UNCOMMON),
 			weapon("diamond_scythe", 7.0, -3.0, 1561, 10, Rarity.RARE),
+			weapon("copper_scythe", 5.0, -3.0, 190, 12, Rarity.COMMON),
 	};
+
+	// creative-only, no recipes and no loot. The dropped item entity is invulnerable (fire, lava, explosions, cactus...):
+	// the damage types are listed in data/bricks_and_beats/tags/damage_type/gravitite_resistant.json
+	private static final DamageResistant GRAVITITE_RESISTANT = new DamageResistant(TagKey.create(Registries.DAMAGE_TYPE, BricksAndBeats.id("gravitite_resistant")));
+	public static final Item HEAVY_GRAVITITE = register("heavy_gravitite", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).component(DataComponents.DAMAGE_RESISTANT, GRAVITITE_RESISTANT), p -> new Gravitites.FlipItem(p, true));
+	public static final Item LIGHT_GRAVITITE = register("light_gravitite", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).component(DataComponents.DAMAGE_RESISTANT, GRAVITITE_RESISTANT), p -> new Gravitites.FlipItem(p, false));
+
+	// Voidlite (see Voidlite.java): the ingot-like gem, netherite-beating armor, sword and pickaxe. Fire-proof like netherite.
+	private static final DamageResistant VOID_RESISTANT = new DamageResistant(DamageTypeTags.IS_FIRE);
+	public static final Item VOIDLITE = register("voidlite", new Item.Properties().rarity(Rarity.EPIC).component(DataComponents.DAMAGE_RESISTANT, VOID_RESISTANT));
+	public static final Item VOIDLITE_HELMET = voidArmor("voidlite_helmet", ArmorType.HELMET);
+	public static final Item VOIDLITE_CHESTPLATE = voidArmor("voidlite_chestplate", ArmorType.CHESTPLATE);
+	public static final Item VOIDLITE_LEGGINGS = voidArmor("voidlite_leggings", ArmorType.LEGGINGS);
+	public static final Item VOIDLITE_BOOTS = voidArmor("voidlite_boots", ArmorType.BOOTS);
+	// netherite sword is 3 + 4 bonus (+1 base) = 8 damage; voidlite is 3 + 6 (+1) = 10
+	public static final Item VOIDLITE_SWORD = register("voidlite_sword", new Item.Properties().sword(Voidlite.TOOL, 3.0F, -2.4F)
+			.rarity(Rarity.EPIC).component(DataComponents.DAMAGE_RESISTANT, VOID_RESISTANT), Item::new);
+	public static final Item VOIDLITE_PICKAXE = register("voidlite_pickaxe", new Item.Properties().pickaxe(Voidlite.TOOL, 1.0F, -2.8F)
+			.rarity(Rarity.EPIC).component(DataComponents.DAMAGE_RESISTANT, VOID_RESISTANT), Item::new);
+
+	private static Item voidArmor(String name, ArmorType type) {
+		return register(name, new Item.Properties().humanoidArmor(Voidlite.ARMOR, type)
+				.durability(type.getDurability(Voidlite.BASE_DURABILITY))
+				.rarity(Rarity.EPIC).component(DataComponents.DAMAGE_RESISTANT, VOID_RESISTANT), Item::new);
+	}
 
 	public static final Item COPPER_ARROW = register("copper_arrow", new Item.Properties(), CustomArrows.CopperArrow::new);
 	public static final Item PHANTOM_ARROW = register("phantom_arrow", new Item.Properties().rarity(Rarity.UNCOMMON), CustomArrows.PhantomArrow::new);

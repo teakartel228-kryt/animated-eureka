@@ -32,7 +32,7 @@ public final class Fx {
 		ServerEntityEvents.ENTITY_LOAD.register((e, level) -> {
 			if (!LIVE.contains(e.getUUID()) && TagUtil.has(e, "ba_fx")) e.discard();
 		});
-		ServerEntityEvents.ENTITY_UNLOAD.register((e, level) -> LIVE.remove(e.getUUID()));
+		ServerEntityEvents.ENTITY_UNLOAD.register((e, level) -> { LIVE.remove(e.getUUID()); SCALE.remove(e.getUUID()); });
 	}
 
 	private static void run(ServerLevel sl, String cmd) {
@@ -90,6 +90,21 @@ public final class Fx {
 				"data merge entity %s {start_interpolation:0,interpolation_duration:1,transformation:{left_rotation:[%.4ff,0f,0f,%.4ff],"
 						+ "right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[1f,1f,1f]}}",
 				e.getUUID(), Math.sin(h), Math.cos(h)));
+	}
+
+	/** Last z-scale sent per display entity (avoids spamming commands every tick). */
+	private static final Map<UUID, Float> SCALE = new java.util.HashMap<>();
+
+	/** Stretches an item display along its local z axis (chain links are squeezed/stretched to tile exactly). */
+	public static void scaleZ(ServerLevel sl, Entity e, float s) {
+		if (e == null || e.isRemoved()) return;
+		Float last = SCALE.get(e.getUUID());
+		if (last != null && Math.abs(last - s) < 0.02F) return;
+		SCALE.put(e.getUUID(), s);
+		run(sl, String.format(Locale.ROOT,
+				"data merge entity %s {start_interpolation:0,interpolation_duration:0,transformation:{left_rotation:[0f,0f,0f,1f],"
+						+ "right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[1f,1f,%.3ff]}}",
+				e.getUUID(), s));
 	}
 
 	/** The display entity lives exactly as long as its owner. */

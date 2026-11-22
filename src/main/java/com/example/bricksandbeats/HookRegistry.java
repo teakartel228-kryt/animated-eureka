@@ -9,9 +9,9 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
-/** Hook items (index = upgrade level 0..5: hook, hook_1 ... hook_5) and the hook entity. */
+/** Hook items (index = upgrade level 0..6: hook, hook_1 ... hook_6 (6 = voidlite)) and the hook entity. */
 public final class HookRegistry {
-	public static final Item[] HOOKS = new Item[6];
+	public static final Item[] HOOKS = new Item[7];
 	public static EntityType<HookEntity> HOOK;
 
 	public static void init() {

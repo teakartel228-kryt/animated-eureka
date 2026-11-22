@@ -19,7 +19,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.piston.PistonStructureResolver;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -124,14 +127,30 @@ public final class HandPiston {
 		// cell the shot starts from: eye level (feet level when shooting down)
 		BlockPos origin = dir == Direction.DOWN ? p.blockPosition() : BlockPos.containing(p.getEyePosition());
 		int reach = len;
-		// first solid cell on the way: push it like a piston
-		for (int i = 1; i <= len; i++) {
-			BlockPos cell = origin.relative(dir, i);
-			BlockState st = sl.getBlockState(cell);
-			if (st.isAir() || !st.getFluidState().isEmpty()) continue;
-			reach = i - 1;
-			pushBlocks(sl, origin.relative(dir, i - 1), dir);
-			break;
+		// the block you are looking at (exact ray, any angle, not only the eye-level row)
+		boolean sneak = p.isShiftKeyDown();
+		int hit = -1;
+		Vec3 eye = p.getEyePosition();
+		BlockHitResult br = sl.clip(new ClipContext(eye, eye.add(look.scale(len)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p));
+		if (br.getType() == HitResult.Type.BLOCK) {
+			hit = 1;
+			reach = Math.max(0, Math.min(len, (int) Math.floor(eye.distanceTo(br.getLocation()))));
+		}
+		// normal shot: the block slides away from you, 1 / 2 / 3 cells by charge, one cell per tick, until something blocks it
+		// sticky piston: the block slides towards you instead. Sneak = anchor pull, no block is moved.
+		if (hit > 0 && !sneak) {
+			final BlockPos start0 = br.getBlockPos();
+			final Direction pd = sticky ? br.getDirection() : br.getDirection().getOpposite();
+			final int steps = 1 + stage;
+			final boolean[] stop = {false};
+			for (int i = 1; i <= steps; i++) {
+				final BlockPos pist = start0.relative(pd, i - 2);
+				Runnable step = () -> {
+					if (!stop[0] && !pushBlocks(sl, pist, pd)) stop[0] = true;
+				};
+				int delay = reach + i - 1;
+				if (delay == 0) step.run(); else Fx.later(sl, delay, step);
+			}
 		}
 
 		// entities: everything close to the aim line (works in any direction, not only along the axes)
@@ -149,8 +168,15 @@ public final class HandPiston {
 			e.hurtMarked = true;
 		}
 
-		// recoil: thrown opposite to the exact aim (shoot down = launch up), none while sneaking
-		if (!p.isShiftKeyDown()) {
+		if (sneak && hit > 0) {
+			// anchor pull
+			double pull = 0.55 + 0.3 * stage;
+			p.setDeltaMovement(look.x * pull, look.y * pull + 0.15, look.z * pull);
+			p.hurtMarked = true;
+			p.resetFallDistance();
+			sl.playSound(null, p.blockPosition(), SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 0.9F, 0.8F);
+		} else if (!sneak) {
+			// recoil: thrown opposite to the exact aim (shoot down = launch up)
 			double r = (0.6 + 0.4 * stage) * (1.0 + 0.6 * recoil);
 			Vec3 v = p.getDeltaMovement();
 			double hop = p.onGround() && look.y > -0.5 ? 0.1 : 0.0;
@@ -159,34 +185,42 @@ public final class HandPiston {
 			p.resetFallDistance();
 		}
 
-		// visual: telescoping piston heads
+		// visual: the shaft extends one segment per tick, holds, then retracts the same way
 		final int shown = Math.max(1, reach);
-		List<Entity> heads = new ArrayList<>();
+		final int hold = charged ? 3 : 1;
+		final Entity[] heads = new Entity[shown + 1];
 		String facing = dir.getSerializedName();
 		for (int i = 1; i <= shown; i++) {
+			final int k = i;
 			BlockPos c = origin.relative(dir, i);
-			Entity head = Fx.block(sl, "{Name:\"minecraft:piston_head\",Properties:{facing:\"" + facing + "\",short:\"false\",type:\"" + (sticky ? "sticky" : "normal") + "\"}}",
-					new Vec3(c.getX(), c.getY(), c.getZ()));
-			if (head != null) heads.add(head);
+			final Vec3 at = new Vec3(c.getX(), c.getY(), c.getZ());
+			String state = "{Name:\"minecraft:piston_head\",Properties:{facing:\"" + facing + "\",short:\"false\",type:\"" + (sticky ? "sticky" : "normal") + "\"}}";
+			Runnable spawn = () -> {
+				heads[k] = Fx.block(sl, state, at);
+				sl.playSound(null, at.x, at.y, at.z, SoundEvents.PISTON_EXTEND, SoundSource.PLAYERS, 0.35F, 1.2F + 0.1F * k);
+				sl.sendParticles(ParticleTypes.POOF, at.x + 0.5, at.y + 0.5, at.z + 0.5, 1, 0.1, 0.1, 0.1, 0.01);
+			};
+			if (i == 1) spawn.run(); else Fx.later(sl, i - 1, spawn);
+			Fx.later(sl, shown + hold + (shown - i), () -> {
+				if (heads[k] != null && !heads[k].isRemoved()) heads[k].discard();
+				sl.playSound(null, at.x, at.y, at.z, SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 0.3F, 1.5F);
+			});
 		}
 		sl.playSound(null, p.blockPosition(), SoundEvents.PISTON_EXTEND, SoundSource.PLAYERS, 1.0F, charged ? 0.7F : 1.0F);
-		Fx.later(sl, charged ? 8 : 5, () -> {
-			for (Entity h : heads) if (!h.isRemoved()) h.discard();
-			sl.playSound(null, p.blockPosition(), SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 0.7F, 1.0F);
-		});
 		p.getCooldowns().addCooldown(stack, stage == 2 ? 30 : stage == 1 ? 20 : 12);
 		p.swing(InteractionHand.MAIN_HAND);
 	}
 
 	/** Moves one block one step along dir exactly like a vanilla piston would (12 blocks max, no block entities, no obsidian...). */
-	private static void pushBlocks(ServerLevel sl, BlockPos pistonPos, Direction dir) {
+	private static boolean pushBlocks(ServerLevel sl, BlockPos pistonPos, Direction dir) {
 		PistonStructureResolver r = new PistonStructureResolver(sl, pistonPos, dir, true);
-		if (!r.resolve()) return;
+		if (!r.resolve()) return false;
 		for (BlockPos d : r.getToDestroy()) sl.destroyBlock(d, true);
 		Map<BlockPos, BlockState> moving = new LinkedHashMap<>();
 		for (BlockPos q : r.getToPush()) moving.put(q, sl.getBlockState(q));
 		for (BlockPos q : moving.keySet()) sl.setBlock(q, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
 		for (Map.Entry<BlockPos, BlockState> en : moving.entrySet()) sl.setBlock(en.getKey().relative(dir), en.getValue(), 3);
+		return true;
 	}
 
 	private HandPiston() {}

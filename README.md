@@ -54,7 +54,7 @@ Wooden / stone / iron / golden / diamond / netherite staff (right click; recipe:
 * Zombies holding a tool dig the blocks that tool is good at when those block their way (MobAbilities.java). Ignores mobGriefing like the other digging zombies.
 * Staffs: new textures, the colored stripe on the shaft is gone.
 * Thrown bricks are a real 3D spinning brick (item_display).
-* Hand Piston (`bricks_and_beats:hand_piston`) + enchantments Piston Power, Sticky Piston, Jet Recoil. No recoil while sneaking.
+* Hand Piston (`bricks_and_beats:hand_piston`) + enchantments Piston Power, Sticky Piston, Jet Recoil. Sneak + hit a block = anchor pull instead of recoil.
 * Spawn eggs for plain zombie / plain skeleton (no variant roll), hooker zombie / skeleton.
 * Tipped arrows / splash / lingering potions of the mod's effects are translated.
 
@@ -69,4 +69,27 @@ Skeletons: Bard, Amethyst Shooter, Ink, Frost, Fire, Venom, Sniper, Storm, Hooke
 * Hooker zombie / skeleton now really carry a hook (tier I plain, II level 2, III level 4) and pull their target in.
 
 ## Hand Piston (v1.6)
-Left click: quick jab. Right click: punch along the exact look direction; hold to charge (tap / half / full: reach 2 / 4 / 6 blocks, more damage and knockback). It pushes the first block like a vanilla piston and throws you back opposite to the aim (shoot down = launch up; sneak = no recoil). Enchantments: Piston Power, Sticky Piston, Jet Recoil.
+Left click: quick jab. Right click: punch along the exact look direction; hold to charge (tap / half / full: reach 2 / 4 / 6 blocks, more damage and knockback). It slides the block you look at (1 / 2 / 3 cells by charge, sticky = towards you) and throws you back opposite to the aim (shoot down = launch up; sneak = no recoil). Enchantments: Piston Power, Sticky Piston, Jet Recoil.
+
+## Gravitites (VVVVVV-style gravity flip)
+
+* Heavy / Light Gravitite (creative tab). Right click while standing on the floor: gravity flips and you fall up.
+  Right click while standing on the ceiling: you fall back down. Flipping in mid-air does nothing (like in VVVVVV).
+* While flipped: the ceiling behaves like ground (normal walking), jumping is disabled, no fall damage,
+  the player model is drawn upside down.
+* Heavy = reversed gravity twice as strong, Light = half as strong.
+* Both gravitites are invulnerable as dropped items: they survive fire, lava, explosions, cactus, etc.
+
+## Voidlite (very rare bedrock ore)
+
+* Sealed Voidlite Ore generates inside the bedrock floor (about 1 vein per 6 chunks), looks like bedrock with purple specks
+  and cannot be mined. A strong explosion right next to it (TNT) weakens it into Weakened Voidlite Ore.
+* Weakened Voidlite Ore needs a diamond-tier pickaxe and takes ~60 s with a Netherite pickaxe + Efficiency V. Drops Voidlite.
+* Block of Voidlite is almost unbreakable (~30 min with the same pickaxe), blast resistance like bedrock.
+* Voidlite armor (defense 24, toughness 6, durability x50), sword (10 damage) and pickaxe (4000 durability) beat Netherite.
+  All voidlite items are fire-proof. Everything is in the creative tab; recipes use Voidlite (helmet 5, chestplate 8, leggings 7, boots 4).
+
+## Hooks (grappling hooks)
+- New 3D grapnel claw (4 curved arms, eye ring, spike) and a real interlocked chain, new inventory icons.
+- Upgrade 6 (Voidlite): smithing table, template `chain` + Hook (upgrade 5) + `voidlite`.
+  Range 48, three hooks at once, 10 damage, faster pull, can pull even 200+ HP bosses, breaks blocks up to hardness 3.

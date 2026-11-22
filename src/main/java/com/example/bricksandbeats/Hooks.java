@@ -40,9 +40,10 @@ import net.minecraft.world.Container;
 import java.util.*;
 
 /**
- * Hook logic. Upgrade level (0..5) = which item: hook, hook_1..hook_5.
+ * Hook logic. Upgrade level (0..6) = which item: hook, hook_1..hook_6.
  *  0: damage 2, light mobs/players, falling blocks, projectiles   1: chests/barrels/shulkers
  *  2: players in copper/iron   3: breaks weak blocks, cracks bricks   4: longer, two hooks   5: heavy targets
+ *  6 (voidlite): range 48, three hooks, 10 damage, faster pull, pulls anything (even bosses), breaks harder blocks
  * Enchantments: Multishot (+1 hook), Quick Charge (shorter lockout), Power (pull speed),
  *  hook_hands, redstone_hook (1..5 charges), defensive_mechanism.
  */
@@ -119,13 +120,13 @@ public final class Hooks {
 			ItemStack st = e.getItemBySlot(s);
 			if (st.isEmpty()) continue;
 			String n = BuiltInRegistries.ITEM.getKey(st.getItem()).getPath();
-			if (n.startsWith("diamond_") || n.startsWith("netherite_")) t = Math.max(t, 2);
+			if (n.startsWith("diamond_") || n.startsWith("netherite_") || n.startsWith("voidlite_")) t = Math.max(t, 2);
 			else if (n.startsWith("iron_") || n.startsWith("copper_")) t = Math.max(t, 1);
 		}
 		return t;
 	}
 
-	/** Hook level needed to pull this creature (6 = never possible). */
+	/** Hook level needed to pull this creature (6 = only the voidlite hook can do it). */
 	static int requiredLevel(LivingEntity e) {
 		if (e instanceof Player) {
 			int t = armorTier(e);
@@ -144,13 +145,17 @@ public final class Hooks {
 		return o.getEyePosition().add(0, -0.45, 0).add(fwd.scale(0.55)).add(right.scale(-0.25));
 	}
 
-	/** Real 3D claw + interlocking chain links drawn with display entities (model per hook level). */
+	/** Distance (in blocks) between the claw's position and its chain eye ring (the ring sits at the back of the head model). */
+	private static final double EYE_BACK = 0.27;
+	/** One chain model covers exactly one block along its z axis (4 interlocked links). */
+	private static final double SEG = 1.0;
+
+	/** Real 3D grappling claw + interlocking chain links drawn with display entities (model per hook level). */
 	static void visuals(ServerLevel sl, HookEntity hook, LivingEntity owner) {
 		Vec3 from = handPos(owner);
 		Vec3 to = hook.position();
 		Vec3 d = to.subtract(from);
-		double len = d.length();
-		int lvl = Math.max(0, Math.min(5, hook.lvl));
+		int lvl = Math.max(0, Math.min(HookRegistry.HOOKS.length - 1, hook.lvl));
 		Vec3 aim = hook.state == HookEntity.State.FLYING && hook.getDeltaMovement().lengthSqr() > 1.0E-4 ? hook.getDeltaMovement() : d;
 		float hy = Fx.yawOf(aim), hp = Fx.pitchOf(aim);
 		if (hook.fxHead == null || hook.fxHead.isRemoved()) {
@@ -159,8 +164,14 @@ public final class Hooks {
 		} else {
 			Fx.move(sl, hook.fxHead, to, hy, hp);
 		}
-		int n = len < 0.6 ? 0 : (int) Math.min(40, Math.ceil(len));
-		float cy = Fx.yawOf(d), cp = Fx.pitchOf(d);
+		// The chain ends at the eye ring on the back of the claw, not in the middle of it.
+		Vec3 aimDir = aim.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : aim.normalize();
+		Vec3 eye = to.subtract(aimDir.scale(EYE_BACK));
+		Vec3 cd = eye.subtract(from);
+		double len = cd.length();
+		int n = len < 0.5 ? 0 : (int) Math.min(48, Math.max(1, Math.round(len / SEG)));
+		float cy = Fx.yawOf(cd), cp = Fx.pitchOf(cd);
+		float stretch = n == 0 ? 1.0F : (float) (len / n / SEG); // links are stretched a little so they tile exactly
 		while (hook.fxChain.size() < n) {
 			Entity seg = Fx.item(sl, "chain_" + lvl, from, cy, cp);
 			Fx.follow(hook, seg);
@@ -173,8 +184,9 @@ public final class Hooks {
 				Fx.move(sl, seg, from, cy, cp);
 				continue;
 			}
-			Vec3 p = from.add(d.scale((i + 0.5) / n));
+			Vec3 p = from.add(cd.scale((i + 0.5) / n));
 			Fx.move(sl, seg, p, cy, cp);
+			Fx.scaleZ(sl, seg, stretch);
 		}
 	}
 
@@ -209,7 +221,7 @@ public final class Hooks {
 		if (lvl < 0) return false;
 		PS ps = STATE.computeIfAbsent(owner.getUUID(), k -> new PS());
 		ps.hooks.removeIf(HookEntity::isRemoved);
-		int max = (lvl >= 4 ? 2 : 1) + (ench(stack, Enchantments.MULTISHOT) > 0 ? 1 : 0);
+		int max = (lvl >= 6 ? 3 : lvl >= 4 ? 2 : 1) + (ench(stack, Enchantments.MULTISHOT) > 0 ? 1 : 0);
 		long now = sl.getGameTime();
 		if (now - ps.lastFire < 4) return false;
 		if (ps.hooks.size() >= max) { // using again with all hooks out = release
@@ -220,8 +232,8 @@ public final class Hooks {
 		HookEntity h = new HookEntity(sl, owner, new ItemStack(ModItems.HOOK_HEAD));
 		h.lvl = lvl;
 		h.power = ench(stack, Enchantments.POWER);
-		h.range = lvl >= 4 ? 32 : 20;
-		h.setDeltaMovement(dir.normalize().scale(2.5));
+		h.range = lvl >= 6 ? 48 : lvl >= 4 ? 32 : 20;
+		h.setDeltaMovement(dir.normalize().scale(lvl >= 6 ? 3.2 : 2.5));
 		sl.addFreshEntity(h);
 		ps.hooks.add(h);
 		sl.playSound(null, owner.getX(), owner.getY(), owner.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0F, 1.6F);
@@ -252,7 +264,7 @@ public final class Hooks {
 		}
 
 		if (target instanceof LivingEntity) {
-			target.hurtServer(sl, sl.damageSources().thrown(hook, owner), 2.0F);
+			target.hurtServer(sl, sl.damageSources().thrown(hook, owner), hook.lvl >= 6 ? 10.0F : 2.0F); // voidlite sword damage
 		}
 		boolean disabled = now < ps.disabledUntil;
 		if (disabled || (target instanceof LivingEntity le && le.isFallFlying())) { // can't catch elytra flyers
@@ -261,7 +273,7 @@ public final class Hooks {
 		}
 		if (target instanceof LivingEntity le) {
 			int need = requiredLevel(le);
-			boolean heavyDouble = hook.lvl >= 5 && need >= 5 && countPullers(ps, target) >= 1
+			boolean heavyDouble = hook.lvl == 5 && need >= 5 && countPullers(ps, target) >= 1
 					&& sl.getRandom().nextFloat() < 0.5F;
 			if (hook.lvl < need || heavyDouble) {
 				emergency(sl, owner, ps, target);
@@ -359,7 +371,7 @@ public final class Hooks {
 				hook.discard();
 				return;
 			}
-			if (hardness >= 0 && hardness <= 0.6F && !(be instanceof Container)) {
+			if (hardness >= 0 && hardness <= (hook.lvl >= 6 ? 3.0F : 0.6F) && !(be instanceof Container)) {
 				sl.destroyBlock(pos, true, owner);
 				hook.discard();
 				return;

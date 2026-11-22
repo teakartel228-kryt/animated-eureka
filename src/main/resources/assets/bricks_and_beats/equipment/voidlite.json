@@ -1,0 +1,19 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "bricks_and_beats:voidlite"
+      }
+    ],
+    "humanoid_baby": [
+      {
+        "texture": "bricks_and_beats:voidlite"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "bricks_and_beats:voidlite"
+      }
+    ]
+  }
+}

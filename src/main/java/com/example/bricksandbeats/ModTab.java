@@ -62,6 +62,8 @@ public final class ModTab {
 					out.accept(ModItems.HAND_PISTON);
 					for (Item d : ModItems.DAGGERS) out.accept(d);
 					for (Item s : ModItems.SCYTHES) out.accept(s);
+					out.accept(ModItems.HEAVY_GRAVITITE);
+					out.accept(ModItems.LIGHT_GRAVITITE);
 					out.accept(ModItems.COPPER_ARROW);
 					out.accept(ModItems.PHANTOM_ARROW);
 					out.accept(ModBlocks.COPPER_TRAP);
@@ -71,6 +73,16 @@ public final class ModTab {
 					out.accept(ModBlocks.DIAMOND_SPIKES);
 					out.accept(ModBlocks.HIDDEN_SPIKES);
 					out.accept(ModBlocks.CHUNK_LOADER);
+					out.accept(ModBlocks.SEALED_VOIDLITE_ORE);
+					out.accept(ModBlocks.WEAKENED_VOIDLITE_ORE);
+					out.accept(ModBlocks.VOIDLITE_BLOCK);
+					out.accept(ModItems.VOIDLITE);
+					out.accept(ModItems.VOIDLITE_HELMET);
+					out.accept(ModItems.VOIDLITE_CHESTPLATE);
+					out.accept(ModItems.VOIDLITE_LEGGINGS);
+					out.accept(ModItems.VOIDLITE_BOOTS);
+					out.accept(ModItems.VOIDLITE_SWORD);
+					out.accept(ModItems.VOIDLITE_PICKAXE);
 					List<Holder<Potion>> potions = List.of(ModEffects.RHYTHM_POTION, ModEffects.BRICK_SKIN_POTION,
 							ModEffects.FRAGILITY_POTION, ModEffects.CHAOS_POTION);
 					for (Holder<Potion> potion : potions) {

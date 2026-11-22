@@ -51,15 +51,18 @@ public final class MobVariants {
 	private static final String NECRO = "ba_mob_necro";
 	private static final String[] ZOMBIE = {"ba_mob_brick", "ba_mob_dynamite", "ba_mob_breaker", "ba_mob_miner",
 			"ba_mob_ram", "ba_mob_digger", "ba_mob_bulwark", "ba_mob_hookz", "ba_mob_hammer", "ba_mob_acid", "ba_mob_runner", "ba_mob_plague",
-			"ba_mob_big", "ba_mob_smart", "ba_mob_giant", "ba_mob_shop", "ba_mob_fisher"};
-	private static final String[] SKELETON = {"ba_mob_bard", "ba_mob_amethyst", "ba_mob_ink", "ba_mob_frost", "ba_mob_fire", "ba_mob_hooks", "ba_mob_venom", "ba_mob_sniper", "ba_mob_storm"};
+			"ba_mob_big", "ba_mob_smart", "ba_mob_giant", "ba_mob_shop", "ba_mob_fisher",
+			"ba_mob_knight", "ba_mob_frozen", "ba_mob_pyro", "ba_mob_shadow", "ba_mob_leech"};
+	private static final String[] SKELETON = {"ba_mob_bard", "ba_mob_amethyst", "ba_mob_ink", "ba_mob_frost", "ba_mob_fire", "ba_mob_hooks", "ba_mob_venom", "ba_mob_sniper", "ba_mob_storm",
+			"ba_mob_cleric", "ba_mob_rogue", "ba_mob_gale", "ba_mob_soul"};
 
 	private static final Map<Mob, String> VARIANT = new IdentityHashMap<>();
 	/** Sub-types a stage zombie can roll, with the stage that unlocks each. */
 	private static final Object[][] UNLOCK = {{"ba_mob_runner", 2}, {"ba_mob_brick", 2}, {"ba_mob_digger", 3}, {"ba_mob_plague", 3},
 			{"ba_mob_acid", 4}, {"ba_mob_dynamite", 4}, {"ba_mob_breaker", 5}, {"ba_mob_fisher", 5}, {"ba_mob_hookz", 5},
 			{"ba_mob_bulwark", 6}, {"ba_mob_miner", 6}, {"ba_mob_smart", 6}, {"ba_mob_hammer", 7}, {"ba_mob_ram", 8},
-			{"ba_mob_big", 8}, {"ba_mob_necro", 9}};
+			{"ba_mob_big", 8}, {"ba_mob_necro", 9},
+			{"ba_mob_frozen", 3}, {"ba_mob_knight", 4}, {"ba_mob_pyro", 4}, {"ba_mob_shadow", 5}, {"ba_mob_leech", 6}};
 	private static final Map<Mob, ItemStack[]> SMART = new IdentityHashMap<>();
 	private static final Map<Mob, Integer> FUSES = new IdentityHashMap<>();
 	private static final Map<Mob, Integer> RISE = new IdentityHashMap<>();
@@ -68,6 +71,8 @@ public final class MobVariants {
 	/** Acid zombies: the block each one is currently dissolving and how far along it is. */
 	private static final Map<Mob, BlockPos> ACID_POS = new IdentityHashMap<>();
 	private static final Map<Mob, Float> ACID_PROGRESS = new IdentityHashMap<>();
+	/** Breaker / ram / digger / hammer: crack progress of every block each mob is currently working on. */
+	private static final Map<Mob, Map<BlockPos, Float>> SMASH = new IdentityHashMap<>();
 
 	/** Power tier of a variant mob: 1 (weak, no tag), 2 (strong), 3 (elite). */
 	public static int tierOf(Mob m) {
@@ -158,6 +163,7 @@ public final class MobVariants {
 				MINIONS.remove(m);
 				ACID_POS.remove(m);
 				ACID_PROGRESS.remove(m);
+				SMASH.remove(m);
 			}
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> tick());
@@ -332,6 +338,59 @@ public final class MobVariants {
 				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.SLIME_BLOCK));
 				hp.setBaseValue(26);
 			}
+			case "ba_mob_knight" -> {
+				name(mob, "knight");
+				mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+				mob.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+				mob.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS));
+				mob.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.5);
+				mob.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.21);
+				hp.setBaseValue(34);
+			}
+			case "ba_mob_frozen" -> {
+				name(mob, "frozen_zombie");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.PACKED_ICE));
+				hp.setBaseValue(26);
+			}
+			case "ba_mob_pyro" -> {
+				name(mob, "pyro");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.MAGMA_BLOCK));
+				mob.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, -1));
+				hp.setBaseValue(24);
+			}
+			case "ba_mob_shadow" -> {
+				name(mob, "shadow");
+				mob.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, -1, 0, false, false));
+				mob.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3);
+				hp.setBaseValue(16);
+			}
+			case "ba_mob_leech" -> {
+				name(mob, "leech");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.REDSTONE_BLOCK));
+				hp.setBaseValue(28);
+			}
+			case "ba_mob_cleric" -> {
+				name(mob, "cleric");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
+				hp.setBaseValue(26);
+			}
+			case "ba_mob_rogue" -> {
+				name(mob, "rogue");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.BLACK_WOOL));
+				mob.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3);
+				hp.setBaseValue(20);
+			}
+			case "ba_mob_gale" -> {
+				name(mob, "gale_skeleton");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.WHITE_WOOL));
+				hp.setBaseValue(22);
+			}
+			case "ba_mob_soul" -> {
+				name(mob, "soul_skeleton");
+				mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.SOUL_LANTERN));
+				hp.setBaseValue(26);
+			}
 			case "ba_mob_runner" -> {
 				name(mob, "runner");
 				mob.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.LEATHER_BOOTS));
@@ -485,33 +544,40 @@ public final class MobVariants {
 
 	private static void breakAhead(ServerLevel level, Mob mob, LivingEntity target, String v, int t) {
 		float max;
+		float speed;
 		int interval;
 		boolean tall = false;
 		boolean down = false;
 		switch (v) {
 			case "ba_mob_breaker" -> {
 				max = 2.5F;
+				speed = 2.5F;
 				interval = 20;
 			}
 			case "ba_mob_miner" -> {
 				max = 4.5F;
+				speed = 4.0F;
 				interval = 12;
 			}
 			case "ba_mob_ram" -> {
 				max = 6.0F;
+				speed = 3.0F;
 				interval = 30;
 				tall = true;
 			}
 			default -> { // digger
 				max = 1.6F;
+				speed = 1.5F;
 				interval = 8;
 				down = true;
 			}
 		}
 		int tier = tierOf(mob);
 		max *= 1.0F + 0.3F * (tier - 1);
+		speed *= 1.0F + 0.3F * (tier - 1);
 		interval = Math.max(4, cd(interval, tier));
 		if (t % interval != 0) return;
+		pruneSmash(level, mob);
 		double dx = target.getX() - mob.getX();
 		double dz = target.getZ() - mob.getZ();
 		BlockPos feet = mob.blockPosition();
@@ -524,16 +590,38 @@ public final class MobVariants {
 			if (tall) cand.add(feet.above(2).relative(dir));
 		}
 		for (BlockPos p : cand) {
-			if (smash(level, mob, p, max) && !tall) break;
+			if (smash(level, mob, p, max, speed * interval) && !tall) break;
 		}
 	}
 
-	private static boolean smash(ServerLevel level, Mob mob, BlockPos p, float maxHardness) {
+	/** Forgets blocks that are already gone or far away (and clears their cracks). */
+	private static void pruneSmash(ServerLevel level, Mob mob) {
+		Map<BlockPos, Float> m = SMASH.get(mob);
+		if (m == null) return;
+		m.keySet().removeIf(q -> {
+			boolean drop = level.getBlockState(q).isAir() || mob.distanceToSqr(Vec3.atCenterOf(q)) > 64.0;
+			if (drop) level.destroyBlockProgress(mob.getId(), q, -1);
+			return drop;
+		});
+	}
+
+	/** Adds one hit of crack progress (power = ticks of work this hit stands for). True = the mob is busy with / broke this block. */
+	private static boolean smash(ServerLevel level, Mob mob, BlockPos p, float maxHardness, float power) {
 		BlockState s = level.getBlockState(p);
 		if (s.isAir() || !s.getFluidState().isEmpty()) return false;
 		float h = s.getDestroySpeed(level, p);
 		if (h < 0.0F || h > maxHardness) return false;
 		mob.swing(InteractionHand.MAIN_HAND);
+		Map<BlockPos, Float> m = SMASH.computeIfAbsent(mob, k -> new java.util.HashMap<>());
+		float prog = m.getOrDefault(p, 0.0F) + BlockBreaking.perTick(level, p, s, 1.0F) * power;
+		if (prog < 1.0F) {
+			m.put(p, prog);
+			level.destroyBlockProgress(mob.getId(), p, (int) (prog * 10.0F));
+			level.playSound(null, p, s.getSoundType().getHitSound(), SoundSource.HOSTILE, 0.6F, 0.8F);
+			return true;
+		}
+		m.remove(p);
+		level.destroyBlockProgress(mob.getId(), p, -1);
 		level.destroyBlock(p, true, mob);
 		return true;
 	}
@@ -547,6 +635,7 @@ public final class MobVariants {
 		BlockPos c = mob.blockPosition();
 		float max = 2.5F + 0.5F * (tier - 1);
 		int broken = 0;
+		pruneSmash(level, mob);
 		for (int dx = -r; dx <= r && broken < 12 * r; dx++) {
 			for (int dz = -r; dz <= r && broken < 12 * r; dz++) {
 				for (int dy = 0; dy <= 2; dy++) {
@@ -556,8 +645,7 @@ public final class MobVariants {
 					if (st.isAir() || !st.getFluidState().isEmpty()) continue;
 					float h = st.getDestroySpeed(level, p);
 					if (h < 0.0F || h > max) continue;
-					level.destroyBlock(p, true, mob);
-					broken++;
+					if (smash(level, mob, p, max, 45.0F * (0.8F + 0.2F * tier)) && level.getBlockState(p).isAir()) broken++;
 				}
 			}
 		}
@@ -601,7 +689,7 @@ public final class MobVariants {
 			return;
 		}
 		float h = Math.max(0.3F, st.getDestroySpeed(level, cur));
-		float prog = ACID_PROGRESS.getOrDefault(mob, 0.0F) + (0.35F * tier) / h / 20.0F;
+		float prog = ACID_PROGRESS.getOrDefault(mob, 0.0F) + BlockBreaking.perTick(level, cur, st, 0.6F * tier);
 		ACID_PROGRESS.put(mob, prog);
 		if (mob.tickCount % 6 == 0) {
 			level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SLIME_BLOCK.defaultBlockState()),
@@ -850,6 +938,70 @@ public final class MobVariants {
 					}
 					if (mob.getHealth() < mob.getMaxHealth() * 0.5F && t % 100 == 0) {
 						mob.addEffect(new MobEffectInstance(MobEffects.SPEED, 120, 1));
+					}
+				}
+				case "ba_mob_frozen" -> {
+					if (t % 20 == 0) {
+						level.sendParticles(ParticleTypes.SNOWFLAKE, mob.getX(), mob.getY() + 1.0, mob.getZ(), 10, 1.2, 0.6, 1.2, 0.02);
+						for (Player pl : level.getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(4 + tier))) {
+							pl.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, tier > 1 ? 1 : 0));
+							pl.setTicksFrozen(140);
+						}
+					}
+				}
+				case "ba_mob_pyro" -> {
+					if (t % 20 == 0 && dist < 3.5) {
+						target.igniteForSeconds(2.0F + tier);
+						level.sendParticles(ParticleTypes.FLAME, target.getX(), target.getY() + 1.0, target.getZ(), 14, 0.3, 0.5, 0.3, 0.03);
+					}
+				}
+				case "ba_mob_shadow" -> {
+					if (t % 30 == 0 && dist < 3.0) {
+						target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40 + 20 * tier, 0));
+						level.sendParticles(ParticleTypes.SMOKE, mob.getX(), mob.getY() + 1.0, mob.getZ(), 8, 0.3, 0.5, 0.3, 0.02);
+					}
+				}
+				case "ba_mob_leech" -> {
+					if (t % 20 == 0 && dist < 3.0) {
+						target.hurtServer(level, level.damageSources().mobAttack(mob), 1.0F + tier);
+						mob.heal(2.0F * tier);
+						level.sendParticles(ParticleTypes.HEART, mob.getX(), mob.getY() + 1.8, mob.getZ(), 3, 0.3, 0.2, 0.3, 0.01);
+					}
+				}
+				case "ba_mob_cleric" -> {
+					if (t % cd(60, tier) == 0) {
+						for (Mob o : level.getEntitiesOfClass(Mob.class, mob.getBoundingBox().inflate(7),
+								x -> x != mob && x.isAlive() && x.getType().getCategory() == MobCategory.MONSTER && !MINIONS.contains(x))) {
+							o.heal(3.0F * tier);
+							level.sendParticles(ParticleTypes.HAPPY_VILLAGER, o.getX(), o.getY() + 1.0, o.getZ(), 5, 0.3, 0.4, 0.3, 0.01);
+						}
+					}
+				}
+				case "ba_mob_rogue" -> {
+					if (t % cd(100, tier) == 0 && dist > 6.0 && dist < 18.0) {
+						Vec3 look = target.getLookAngle();
+						Vec3 to = target.position().subtract(look.x * 3.0, 0.0, look.z * 3.0);
+						BlockPos bp = BlockPos.containing(to.x, target.getY(), to.z);
+						if (level.getBlockState(bp).isAir() && level.getBlockState(bp.above()).isAir()) {
+							level.sendParticles(ParticleTypes.PORTAL, mob.getX(), mob.getY() + 1.0, mob.getZ(), 20, 0.3, 0.6, 0.3, 0.2);
+							mob.setPos(to.x, target.getY(), to.z);
+							level.playSound(null, bp, SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 0.8F, 1.3F);
+						}
+					}
+				}
+				case "ba_mob_gale" -> {
+					if (t % cd(50, tier) == 0 && dist < 7.0) {
+						Vec3 n = target.position().subtract(mob.position()).multiply(1, 0, 1).normalize();
+						target.push(n.x * (1.0 + 0.3 * tier), 0.45, n.z * (1.0 + 0.3 * tier));
+						target.hurtMarked = true;
+						level.sendParticles(ParticleTypes.CLOUD, mob.getX(), mob.getY() + 1.0, mob.getZ(), 14, 0.4, 0.4, 0.4, 0.1);
+						level.playSound(null, mob.blockPosition(), SoundEvents.BREEZE_SHOOT, SoundSource.HOSTILE, 0.8F, 1.2F);
+					}
+				}
+				case "ba_mob_soul" -> {
+					if (t % cd(90, tier) == 0 && dist < 14.0 && mob.hasLineOfSight(target)) {
+						target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 30 + 20 * tier, 0));
+						level.sendParticles(ParticleTypes.SOUL, target.getX(), target.getY() + 0.5, target.getZ(), 14, 0.3, 0.6, 0.3, 0.04);
 					}
 				}
 				case "ba_mob_smart" -> smartTool(level, mob, target);

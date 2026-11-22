@@ -239,7 +239,7 @@ public final class Stages {
 		}
 		mob.getLookControl().setLookAt(d.pos.getX() + 0.5, d.pos.getY() + 0.5, d.pos.getZ() + 0.5);
 		float h = Math.max(0.2F, st.getDestroySpeed(level, d.pos));
-		d.progress += (0.5F + 0.25F * s) / (h * 30.0F);
+		d.progress += BlockBreaking.perTick(level, d.pos, st, 0.5F + 0.25F * s);
 		if (mob.tickCount % 6 == 0) mob.swing(InteractionHand.MAIN_HAND);
 		if (d.progress < 1.0F) {
 			level.destroyBlockProgress(mob.getId(), d.pos, (int) (d.progress * 10.0F));

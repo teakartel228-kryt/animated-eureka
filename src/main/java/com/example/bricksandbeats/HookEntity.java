@@ -18,7 +18,7 @@ public class HookEntity extends ThrowableItemProjectile {
 	public enum State { FLYING, GRAPPLE, PULL }
 
 	public State state = State.FLYING;
-	public int lvl;      // upgrade level 0..5
+	public int lvl;      // upgrade level 0..6
 	public int power;    // Power enchantment: pull speed
 	public double range = 20;
 	public Vec3 anchor;  // GRAPPLE point
@@ -61,6 +61,9 @@ public class HookEntity extends ThrowableItemProjectile {
 		age++;
 		if (origin == null) origin = position();
 		Hooks.visuals(sl, this, owner);
+		if (lvl >= 6 && age % 2 == 0) { // voidlite: purple void sparks trail behind the claw
+			sl.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL, getX(), getY(), getZ(), 2, 0.12, 0.12, 0.12, 0.02);
+		}
 
 		switch (state) {
 			case FLYING -> {
@@ -96,7 +99,7 @@ public class HookEntity extends ThrowableItemProjectile {
 					discard();
 					return;
 				}
-				t.setDeltaMovement(d.normalize().scale(0.6 + 0.15 * power).add(0, 0.05, 0));
+				t.setDeltaMovement(d.normalize().scale((lvl >= 6 ? 0.9 : 0.6) + 0.15 * power).add(0, 0.05, 0));
 				t.hurtMarked = true;
 				setPos(t.getX(), t.getY(0.5), t.getZ());
 			}

@@ -49,6 +49,15 @@ public final class VariantEggs {
 			{"sniper_skeleton", "skeleton", "ba_mob_sniper"},
 			{"storm_skeleton", "skeleton", "ba_mob_storm"},
 			{"hooker_skeleton", "skeleton", "ba_mob_hooks"},
+			{"knight", "zombie", "ba_mob_knight"},
+			{"frozen_zombie", "zombie", "ba_mob_frozen"},
+			{"pyro", "zombie", "ba_mob_pyro"},
+			{"shadow", "zombie", "ba_mob_shadow"},
+			{"leech", "zombie", "ba_mob_leech"},
+			{"cleric", "skeleton", "ba_mob_cleric"},
+			{"rogue", "skeleton", "ba_mob_rogue"},
+			{"gale_skeleton", "skeleton", "ba_mob_gale"},
+			{"soul_skeleton", "skeleton", "ba_mob_soul"},
 	};
 
 	/** Name-colour rarity and frame colour of tier 1 / 2 / 3. */

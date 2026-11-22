@@ -26,6 +26,16 @@ public final class ModBlocks {
 	public static final Block CHUNK_LOADER = block("chunk_loader", Block::new, BlockBehaviour.Properties.of()
 			.mapColor(MapColor.COLOR_PURPLE).strength(5.0F, 1200.0F).sound(SoundType.METAL).lightLevel(s -> 7));
 
+	// Voidlite: see Voidlite.java. Sealed = unbreakable until a strong explosion (blast resistance 8: TNT next to it) weakens it.
+	public static final Block SEALED_VOIDLITE_ORE = block("sealed_voidlite_ore", SealedVoidliteOre::new, BlockBehaviour.Properties.of()
+			.mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 8.0F).sound(SoundType.DEEPSLATE).requiresCorrectToolForDrops());
+	// hardness 1400 = 60 s with a Netherite pickaxe + Efficiency V (1400 * 30 / 35 = 1200 ticks)
+	public static final Block WEAKENED_VOIDLITE_ORE = block("weakened_voidlite_ore", Block::new, BlockBehaviour.Properties.of()
+			.mapColor(MapColor.COLOR_PURPLE).strength(1400.0F, 1200.0F).sound(SoundType.DEEPSLATE).requiresCorrectToolForDrops().lightLevel(s -> 3));
+	// "almost unbreakable": about 30 minutes with the same pickaxe
+	public static final Block VOIDLITE_BLOCK = block("voidlite_block", Block::new, BlockBehaviour.Properties.of()
+			.mapColor(MapColor.COLOR_BLACK).strength(42000.0F, 3600000.0F).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops());
+
 	private static Block hazard(String name, float damage, int root, int cooldown, boolean bleed, double height, double inset, SoundType sound) {
 		BlockBehaviour.Properties p = BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(2.0F, 3.0F)
 				.sound(sound).noCollision().noOcclusion().pushReaction(PushReaction.DESTROY);

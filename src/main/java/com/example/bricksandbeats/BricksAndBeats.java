@@ -38,6 +38,9 @@ public class BricksAndBeats implements ModInitializer {
 		Hazards.init();
 		ChunkLoaders.init();
 		NewEnchants.init();
+		MoreEnchants.init();
+		Gravitites.init();
+		Voidlite.init();
 		ModTab.init();
 
 		UseItemCallback.EVENT.register(Hooks::use);
