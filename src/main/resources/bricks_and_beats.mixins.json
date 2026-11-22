@@ -5,7 +5,12 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AbstractArrowAccessor",
-    "PotionBrewingMixin"
+    "PotionBrewingMixin",
+    "GravityGroundMixin",
+    "GravityJumpMixin"
+  ],
+  "client": [
+    "GravityRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 0
