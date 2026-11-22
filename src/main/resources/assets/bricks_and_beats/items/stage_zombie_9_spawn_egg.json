@@ -1,0 +1,17 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "bricks_and_beats:item/egg_stage_zombie_9",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 16777215
+      },
+      {
+        "type": "minecraft:custom_model_data",
+        "index": 0,
+        "default": 11184810
+      }
+    ]
+  }
+}

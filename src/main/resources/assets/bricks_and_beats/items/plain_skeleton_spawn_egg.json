@@ -1,15 +1,16 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "bricks_and_beats:item/variant_spawn_egg",
+    "model": "bricks_and_beats:item/egg_plain_skeleton",
     "tints": [
       {
         "type": "minecraft:constant",
-        "value": 12698049
+        "value": 16777215
       },
       {
-        "type": "minecraft:constant",
-        "value": 4802889
+        "type": "minecraft:custom_model_data",
+        "index": 0,
+        "default": 11184810
       }
     ]
   }
