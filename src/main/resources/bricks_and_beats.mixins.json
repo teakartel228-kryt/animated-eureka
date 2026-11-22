@@ -4,6 +4,7 @@
   "package": "com.example.bricksandbeats.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AbstractArrowAccessor",
     "PotionBrewingMixin"
   ],
   "injectors": {
